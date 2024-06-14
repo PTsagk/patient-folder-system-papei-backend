@@ -15,7 +15,7 @@ export const createBiochemicalBloodExam = async (
 };
 
 async function createNewBiochemicalBloodExam(userInfo: any, examInfo: any) {
-  let user = await getUserByIdQuery(userInfo.id);
+  let user = await getUserByIdQuery(userInfo.id, "user");
   if (!user) {
     user = await createNewUser(userInfo);
   }
@@ -53,3 +53,20 @@ async function createNewBiochemicalBloodExam(userInfo: any, examInfo: any) {
   );
   return row;
 }
+
+export const getBiochemicalBloodExamById = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const [row] = await sqlPool.query(
+      `select * from biochemical_blood_exam where user_id = ?`,
+      [id]
+    );
+    res.json(row).status(200);
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+  }
+};

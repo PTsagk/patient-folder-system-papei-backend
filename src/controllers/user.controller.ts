@@ -37,7 +37,7 @@ export const userAuth = async (req: Request, res: Response) => {
         }
         //@ts-ignore
         const { id } = decoded;
-        const user = await getUserByIdQuery(id);
+        const user = await getUserByIdQuery(id, "user");
         if (user) {
           res.json(user).status(200);
         } else {
@@ -138,11 +138,11 @@ async function getUserByUsernameAndPassword(
   return rows[0][0];
 }
 
-export async function getUserByIdQuery(id: number) {
+export async function getUserByIdQuery(id: number, role: string) {
   // @ts-ignore
 
   const [rows] = await sqlPool.query(
-    `select * from user where id=?
+    `select * from ${role} where id=?
     `,
     [id]
   );
