@@ -33,13 +33,12 @@ app.use(
 // app.use(cookieParser());
 const port = process.env.PORT || 8000;
 
-app.get("/", (req: Request, res: Response) => {
-  res.send("Welcome to Express & TypeScript Server!!!!");
-});
-
 app.use("/user", userRoute);
 // app.use("/program", programRoute);
 
+app.get("*", (req: Request, res: Response) => {
+  res.status(404).send("Page Not Found");
+});
 app.listen(port, () => {
   console.log(`Server is Fire at http://localhost:${port}`);
 });

@@ -9,10 +9,7 @@ import {
   updateUserPfp,
   updateUserInfo,
 } from "../controllers/user.controller";
-import {
-  authenticateAdmin,
-  authenticateController,
-} from "../controllers/authenticate.controller";
+import { authenticateAdmin } from "../controllers/authenticate.controller";
 const router = express.Router();
 router.route("/login").post(userLogin);
 router.route("/auth").get(userAuth);
