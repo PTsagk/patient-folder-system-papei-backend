@@ -5,8 +5,9 @@ import jwt from "jsonwebtoken";
 export const userLogin = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
+    const role = req.params.role;
     const [user]: any = await sqlPool.query(
-      "SELECT * FROM user WHERE email = ?",
+      `SELECT * FROM ${role} WHERE email = ?`,
       [email]
     );
     if (user.length > 0) {
@@ -60,6 +61,15 @@ export const userRegister = async (req: Request, res: Response) => {
     res.json("Internal Server Error").status(500);
   }
 };
+export const doctorRegister = async (req: Request, res: Response) => {
+  try {
+    await createNewDoctor(req.body);
+    res.json("OK").status(200);
+  } catch (error) {
+    console.log(error);
+    res.json("Internal Server Error").status(500);
+  }
+};
 export const userUpdate = async (req: Request, res: Response) => {
   try {
     await updateExistingUser(req.body);
@@ -72,7 +82,8 @@ export const userUpdate = async (req: Request, res: Response) => {
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
-    const usersList = await getUsers();
+    const role = req.params.role;
+    const usersList = await getUsers(role);
     res.json(usersList).status(200);
   } catch (error) {
     console.log(error);
@@ -83,7 +94,8 @@ export const getAllUsers = async (req: Request, res: Response) => {
 export const userDeleteById = async (req: Request, res: Response) => {
   try {
     const { id } = req.body;
-    const user = await deleteUserById(id);
+    const role = req.params.role;
+    const user = await deleteUserById(id, role);
     if (!user) {
       throw new Error("User not found");
     }
@@ -96,8 +108,9 @@ export const userDeleteById = async (req: Request, res: Response) => {
 
 export const updateUserPfp = async (req: Request, res: Response) => {
   try {
+    const role = req.params.role;
     const { image, id } = req.body;
-    const newUser = await updateUserPfpById(image, id);
+    const newUser = await updateUserPfpById(image, id, role);
     //@ts-ignore
     if (newUser.affectedRows > 0) {
       res.status(200).json("OK");
@@ -145,11 +158,11 @@ export async function getAdminByIdQuery(id: string) {
   return rows[0];
 }
 
-async function getUsers() {
+async function getUsers(role: string) {
   // @ts-ignore
 
   const [rows] = await sqlPool.query<IUser[]>(
-    `select * from user
+    `select * from ${role}
      `
   );
   return rows[0];
@@ -184,6 +197,29 @@ async function createNewUser(user: any) {
   return row;
 }
 
+async function createNewDoctor(doctor: any) {
+  // @ts-ignore
+
+  // const [row] = await sqlPool.query<IUser>(
+  const [row] = await sqlPool.query<{ id: string }[]>(
+    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)`,
+    [
+      doctor.name,
+      doctor.surname,
+      doctor.email,
+      doctor.country,
+      doctor.city,
+      doctor.street,
+      doctor.telephone,
+      doctor.gender,
+      doctor.amka,
+      doctor.image,
+      doctor.password,
+    ]
+  );
+  return row;
+}
+
 async function updateExistingUser(user: any) {
   // @ts-ignore
 
@@ -213,18 +249,18 @@ async function updateExistingUser(user: any) {
   return row;
 }
 
-async function deleteUserById(id: any) {
+async function deleteUserById(id: any, role: string) {
   // @ts-ignore
   const [row] = await sqlPool.query<IUser>(
-    `delete from user where id=?
+    `delete from ${role} where id=?
      `,
     [id]
   );
   return row;
 }
 
-async function updateUserPfpById(image: any, id: any) {
-  const [rows] = await sqlPool.query(`update user set image=? where id=?`, [
+async function updateUserPfpById(image: any, id: any, role: string) {
+  const [rows] = await sqlPool.query(`update ${role} set image=? where id=?`, [
     image,
     id,
   ]);
