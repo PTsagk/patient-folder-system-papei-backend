@@ -62,7 +62,7 @@ export const userRegister = async (req: Request, res: Response) => {
 };
 export const userUpdate = async (req: Request, res: Response) => {
   try {
-    const updatedUser = await updateExistingUser(req.body);
+    await updateExistingUser(req.body);
     res.json("OK").status(200);
   } catch (error) {
     console.log(error);
@@ -98,20 +98,6 @@ export const updateUserPfp = async (req: Request, res: Response) => {
   try {
     const { image, id } = req.body;
     const newUser = await updateUserPfpById(image, id);
-    //@ts-ignore
-    if (newUser.affectedRows > 0) {
-      res.status(200).json("OK");
-    } else {
-      throw new Error("Uknown error");
-    }
-  } catch (error) {
-    console.log(error);
-    res.json("Internal Server Error").status(500);
-  }
-};
-export const updateUserInfo = async (req: Request, res: Response) => {
-  try {
-    const newUser = await updateUserInfoQuery(req.body);
     //@ts-ignore
     if (newUser.affectedRows > 0) {
       res.status(200).json("OK");
@@ -202,26 +188,8 @@ async function updateExistingUser(user: any) {
   // @ts-ignore
 
   const [row] = await sqlPool.query(
-    `update user set name=?, surname=?, email=?, username=?, password=?, image=?, role=?, about=? where id=?
+    `update user set name=?, surname=?, email=?, country=?, city=?, street=?,telephone=?,gender=?,age=?,height=?,weight=?,amka=?,region=?,address_num=?,image=?,doctor_id=? where id=?
      `,
-    [
-      user.id,
-      user.name,
-      user.surname,
-      user.email,
-      user.username,
-      user.password,
-      user.image,
-      user.role,
-      user.about,
-    ]
-  );
-  return row;
-}
-
-async function updateUserInfoQuery(user: any) {
-  const [row] = await sqlPool.query(
-    "update user set name=?, surname=?, email=?, country=?, city=?, street=?,telephone=?,gender=?,age=?,height=?,weight=?,amka=?,region=?,address_num=?,image=?,doctor_id=? where id=?",
     [
       user.name,
       user.surname,
