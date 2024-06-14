@@ -1,13 +1,45 @@
-import express, { Request, Response } from "express";
-const app = express();
-const port = 3000;
+import express, { Express, Request, Response, Application } from "express";
+import cookieParser from "cookie-parser";
+import dotenv from "dotenv";
+import cors from "cors";
+import multer from "multer";
+import userRoute from "./routes/user.route";
+import { authenticateController } from "./controllers/authenticate.controller";
+import bodyParser from "body-parser";
 
-app.get("/", (req:Request, res:Response) => {
-  res.send("Hello World!");
+const upload = multer();
+//For env File
+dotenv.config();
+
+const app: Application = express();
+app.use(express.urlencoded({ extended: true, limit: 4000000 }));
+app.use(express.json({ limit: 4000000 }));
+app.use(cookieParser());
+app.use(
+  cors({
+    origin: ["http://localhost:4200", "http://83.212.75.182:4242"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+    credentials: true,
+  })
+);
+// app.use(upload.array())
+// app.use(
+//   bodyParser.urlencoded({
+//     extended: true,
+//     limit: 4000000,
+//     parameterLimit: 50000,
+//   })
+// );
+// app.use(cookieParser());
+const port = process.env.PORT || 8000;
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Welcome to Express & TypeScript Server!!!!");
 });
-app.get("/health", (req, res) => {
-  res.send("OK");
-});
+
+app.use("/user", userRoute);
+// app.use("/program", programRoute);
+
 app.listen(port, () => {
-  return console.log(`Express is listening at http://localhost:${port}`);
+  console.log(`Server is Fire at http://localhost:${port}`);
 });
