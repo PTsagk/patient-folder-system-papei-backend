@@ -169,7 +169,7 @@ async function getUsers(role: string) {
   return rows[0];
 }
 
-async function createNewUser(user: any) {
+export async function createNewUser(user: any) {
   const password = uuidv4();
   // @ts-ignore
 
@@ -205,7 +205,7 @@ async function createNewDoctor(doctor: any) {
 
   // const [row] = await sqlPool.query<IUser>(
   const [row] = await sqlPool.query<{ id: string }[]>(
-    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)`,
+    `insert into doctor (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)`,
     [
       doctor.name,
       doctor.surname,
