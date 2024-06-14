@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import cors from "cors";
 import multer from "multer";
 import userRoute from "./routes/user.route";
+import examRoute from "./routes/exams.route";
 
 const upload = multer();
 //For env File
@@ -32,6 +33,7 @@ app.use(
 const port = process.env.PORT || 8000;
 
 app.use("/user", userRoute);
+app.use("/exam", examRoute);
 // app.use("/program", programRoute);
 
 app.get("*", (req: Request, res: Response) => {
