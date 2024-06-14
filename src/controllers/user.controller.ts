@@ -174,7 +174,7 @@ async function createNewUser(user: any) {
 
   // const [row] = await sqlPool.query<IUser>(
   const [row] = await sqlPool.query<{ id: string }[]>(
-    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)`,
+    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)`,
     [
       user.name,
       user.surname,
@@ -192,6 +192,7 @@ async function createNewUser(user: any) {
       user.address_num,
       user.image,
       user.doctor_id,
+      user.password,
     ]
   );
   return row;
