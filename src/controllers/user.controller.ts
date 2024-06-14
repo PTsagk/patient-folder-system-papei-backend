@@ -1,6 +1,7 @@
 import { NextFunction, Request, Response } from "express";
 import { sqlPool } from "../mysqlPool";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
@@ -169,9 +170,11 @@ async function getUsers(role: string) {
 }
 
 async function createNewUser(user: any) {
+  const password = uuidv4();
   // @ts-ignore
 
   // const [row] = await sqlPool.query<IUser>(
+
   const [row] = await sqlPool.query<{ id: string }[]>(
     `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)`,
     [
@@ -191,7 +194,7 @@ async function createNewUser(user: any) {
       user.address_num,
       user.image,
       user.doctor_id,
-      user.password,
+      password,
     ]
   );
   return row;
