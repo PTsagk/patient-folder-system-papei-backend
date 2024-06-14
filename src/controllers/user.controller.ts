@@ -4,6 +4,20 @@ import jwt from "jsonwebtoken";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
+    const { email } = req.body;
+    const [user]: any = await sqlPool.query(
+      "SELECT * FROM user WHERE email = ?",
+      [email]
+    );
+    if (user.length > 0) {
+      const token = jwt.sign({ id: user[0].id }, "secret", {
+        expiresIn: "1h",
+      });
+      res.cookie("auth", token, { httpOnly: true });
+      res.json(user[0]).status(200);
+    } else {
+      res.status(404).json("User not found");
+    }
   } catch (error) {
     console.log(error);
     res.status(500).json("Internal Server Error");
@@ -142,7 +156,7 @@ export async function getAdminByIdQuery(id: string) {
     [id]
   );
   // @ts-ignore
-  return rows[0][0];
+  return rows[0];
 }
 
 async function getUsers() {
@@ -160,7 +174,7 @@ async function createNewUser(user: any) {
 
   // const [row] = await sqlPool.query<IUser>(
   const [row] = await sqlPool.query<{ id: string }[]>(
-    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?)`,
+    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)`,
     [
       user.name,
       user.surname,
@@ -177,6 +191,7 @@ async function createNewUser(user: any) {
       user.region,
       user.address_num,
       user.image,
+      user.doctor_id,
     ]
   );
   return row;
