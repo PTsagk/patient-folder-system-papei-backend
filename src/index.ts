@@ -1,11 +1,9 @@
-import express, { Express, Request, Response, Application } from "express";
+import express, { Request, Response, Application } from "express";
 import cookieParser from "cookie-parser";
 import dotenv from "dotenv";
 import cors from "cors";
 import multer from "multer";
 import userRoute from "./routes/user.route";
-import { authenticateController } from "./controllers/authenticate.controller";
-import bodyParser from "body-parser";
 
 const upload = multer();
 //For env File

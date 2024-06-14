@@ -219,22 +219,28 @@ async function updateExistingUser(user: any) {
   return row;
 }
 
-async function updateUserInfoQuery({
-  userId,
-  username,
-  email,
-  password,
-  about,
-}: {
-  userId: string;
-  username: string;
-  email: string;
-  password: string;
-  about: string;
-}) {
+async function updateUserInfoQuery(user: any) {
   const [row] = await sqlPool.query(
-    "update user set username=?, email=?, password=?, about=? where id=?",
-    [userId, username, email, password, about]
+    "update user set name=?, surname=?, email=?, country=?, city=?, street=?,telephone=?,gender=?,age=?,height=?,weight=?,amka=?,region=?,address_num=?,image=?,doctor_id=? where id=?",
+    [
+      user.name,
+      user.surname,
+      user.email,
+      user.country,
+      user.city,
+      user.street,
+      user.telephone,
+      user.gender,
+      user.age,
+      user.height,
+      user.weight,
+      user.amka,
+      user.region,
+      user.address_num,
+      user.image,
+      user.doctor_id,
+      user.password,
+    ]
   );
   return row;
 }
