@@ -27,8 +27,8 @@ export const userLogin = async (req: Request, res: Response) => {
         expiresIn: "1d",
       });
       res.cookie("auth", token, {
-        // httpOnly: true,
-        path: "/",
+        httpOnly: true,
+        secure: false,
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
       });
       res.json(user[0]).status(200);
