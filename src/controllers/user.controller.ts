@@ -23,7 +23,7 @@ export const userLogin = async (req: Request, res: Response) => {
       );
     }
     if (user.length > 0) {
-      const token = jwt.sign({ id: user[0].id }, "secret", {
+      const token = jwt.sign({ id: user[0].id, role: user[0].role }, "secret", {
         expiresIn: "1d",
       });
       res.cookie("auth", token, {
@@ -51,8 +51,8 @@ export const userAuth = async (req: Request, res: Response) => {
           console.error(err);
         }
         //@ts-ignore
-        const { id } = decoded;
-        const user = await getUserByIdQuery(id, "user");
+        const { id, role } = decoded;
+        const user = await getUserByIdQuery(id, role);
         if (user) {
           res.json(user).status(200);
         } else {
@@ -162,7 +162,7 @@ export async function getUserByIdQuery(id: number, role: string) {
     [id]
   );
   // @ts-ignore
-  return rows[0][0];
+  return rows[0];
 }
 export async function getAdminByIdQuery(id: string) {
   const [rows] = await sqlPool.query(
