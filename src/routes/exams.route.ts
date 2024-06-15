@@ -2,6 +2,7 @@ import express from "express";
 import {
   getBiochemicalBloodExamById,
   createBiochemicalBloodExam,
+  getAllExamsByUserId,
 } from "../controllers/exam.controller";
 
 import { authenticateDoctor } from "../controllers/authenticate.controller";
@@ -11,5 +12,5 @@ router
   .route("/create")
   .all(authenticateDoctor)
   .post(createBiochemicalBloodExam);
-
+router.route("/all").get(getAllExamsByUserId);
 export default router;
