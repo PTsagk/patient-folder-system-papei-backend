@@ -1,19 +1,30 @@
-import { NextFunction, Request, Response } from "express";
-import { sqlPool } from "../mysqlPool";
+import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
+import { sqlPool } from "../mysqlPool";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
-    const { email } = req.body;
-    const role = req.params.role;
-    const [user]: any = await sqlPool.query(
-      `SELECT * FROM ${role} WHERE email = ?`,
-      [email]
+    const { email, password } = req.body;
+    let [user]: any = await sqlPool.query(
+      `SELECT * FROM user WHERE email = ? AND password = ?`,
+      [email, password]
     );
+    if (user.length < 1) {
+      [user] = await sqlPool.query(
+        `SELECT * FROM doctor WHERE email = ? AND password = ?`,
+        [email, password]
+      );
+    }
+    if (user.length < 1) {
+      [user] = await sqlPool.query(
+        `SELECT * FROM admin WHERE email = ? AND password = ?`,
+        [email, password]
+      );
+    }
     if (user.length > 0) {
       const token = jwt.sign({ id: user[0].id }, "secret", {
-        expiresIn: "1h",
+        expiresIn: "1d",
       });
       res.cookie("auth", token, { httpOnly: true });
       res.json(user[0]).status(200);
