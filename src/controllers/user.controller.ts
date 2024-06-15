@@ -26,7 +26,11 @@ export const userLogin = async (req: Request, res: Response) => {
       const token = jwt.sign({ id: user[0].id }, "secret", {
         expiresIn: "1d",
       });
-      res.cookie("auth", token, { httpOnly: true });
+      res.cookie("auth", token, {
+        httpOnly: true,
+        path: "/",
+        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+      });
       res.json(user[0]).status(200);
     } else {
       res.status(404).json("User not found");
