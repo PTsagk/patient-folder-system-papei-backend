@@ -216,23 +216,20 @@ export async function createNewUser(user: any) {
 }
 
 async function createNewDoctor(doctor: any) {
+  const password = uuidv4();
   // @ts-ignore
 
   // const [row] = await sqlPool.query<IUser>(
   const [row] = await sqlPool.query<{ id: string }[]>(
-    `insert into doctor (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)`,
+    `insert into doctor (name, surname, email,telephone,gender,amka,image,password) values (?, ?, ?, ?, ?, ?, NULL, ?)`,
     [
       doctor.name,
       doctor.surname,
       doctor.email,
-      doctor.country,
-      doctor.city,
-      doctor.street,
       doctor.telephone,
       doctor.gender,
       doctor.amka,
-      doctor.image,
-      doctor.password,
+      password,
     ]
   );
   return row;
