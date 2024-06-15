@@ -1,16 +1,16 @@
 import express from "express";
+import { authenticateAdmin } from "../controllers/authenticate.controller";
 import {
+  getAllUsers,
+  updateUserPfp,
+  userAuth,
+  userDeleteById,
   userLogin,
   userRegister,
   userUpdate,
-  getAllUsers,
-  userDeleteById,
-  userAuth,
-  updateUserPfp,
 } from "../controllers/user.controller";
-import { authenticateAdmin } from "../controllers/authenticate.controller";
 const router = express.Router();
-router.route("/login/:role").post(userLogin);
+router.route("/login").post(userLogin);
 router.route("/auth").get(userAuth);
 router.route("/register_user").post(userRegister);
 router.route("/register_doctor").post(userRegister);

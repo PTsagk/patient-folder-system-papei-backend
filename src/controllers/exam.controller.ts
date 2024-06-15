@@ -15,7 +15,10 @@ export const createBiochemicalBloodExam = async (
 };
 
 async function createNewBiochemicalBloodExam(userInfo: any, examInfo: any) {
-  let user = await getUserByIdQuery(userInfo.id, "user");
+  let user;
+  if (userInfo.id) {
+    user = await getUserByIdQuery(userInfo.id, "user");
+  }
   if (!user) {
     user = await createNewUser(userInfo);
   }
@@ -54,7 +57,7 @@ async function createNewBiochemicalBloodExam(userInfo: any, examInfo: any) {
   return row;
 }
 
-export const getBiochemicalBloodExamById = async (
+export const getBiochemicalBloodExamByUserId = async (
   req: Request,
   res: Response
 ) => {
@@ -76,6 +79,16 @@ export const getAllExamsByUserId = async (req: Request, res: Response) => {
     const { id } = req.params;
     const exams = await getUserExams(parseInt(id));
     res.status(200).send(exams);
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+  }
+};
+// hormonal blood exams
+export const createHormonalBloodExam = async (req: Request, res: Response) => {
+  try {
+    await createNewHormonalBloodExam(req.body.userInfo, req.body.examInfo);
+    res.json("OK").status(200);
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
@@ -128,3 +141,42 @@ async function getUserExams(userID: number) {
   // @ts-ignore
   return row[0];
 }
+async function createNewHormonalBloodExam(userInfo: any, examInfo: any) {
+  let user;
+  if (userInfo.id) {
+    user = await getUserByIdQuery(userInfo.id, "user");
+  }
+  if (!user) {
+    user = await createNewUser(userInfo);
+  }
+  const [row] = await sqlPool.query(
+    `insert into hormonal_blood_exam (date,	doctor_id,	user_id,	thyroid_stimulating_hormone,	triiodothyronine,	free_thyroxine,	anti_TPO,	anti_TG,	parathormone,	calcitonin) values (?,?,?,?,?,?,?,?,?,?)`,
+    [
+      examInfo.date,
+      examInfo.doctor_id,
+      user.id,
+      examInfo.thyroid_stimulating_hormone,
+      examInfo.triiodothyronine,
+      examInfo.free_thyroxine,
+      examInfo.anti_TPO,
+      examInfo.anti_TG,
+      examInfo.parathormone,
+      examInfo.calcitonin,
+    ]
+  );
+  return row;
+}
+
+export const getHormonalBloodExamById = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const [row] = await sqlPool.query(
+      `select * from hormonal_blood_exam where user_id = ?`,
+      [id]
+    );
+    res.json(row).status(200);
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+  }
+};

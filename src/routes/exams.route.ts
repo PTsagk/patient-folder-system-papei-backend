@@ -1,16 +1,18 @@
 import express from "express";
 import {
-  getBiochemicalBloodExamById,
+  getBiochemicalBloodExamByUserId,
   createBiochemicalBloodExam,
   getAllExamsByUserId,
+  getHormonalBloodExamById,
+  createHormonalBloodExam,
 } from "../controllers/exam.controller";
 
-import { authenticateDoctor } from "../controllers/authenticate.controller";
 const router = express.Router();
-router.route("/get").all(authenticateDoctor).get(getBiochemicalBloodExamById);
-router
-  .route("/create")
-  .all(authenticateDoctor)
-  .post(createBiochemicalBloodExam);
 router.route("/all").get(getAllExamsByUserId);
+router.route("/biochemical_exam").get(getBiochemicalBloodExamByUserId);
+router.route("/hormonal_exam").get(getHormonalBloodExamById);
+
+router.route("/biochemical_exam").post(createBiochemicalBloodExam);
+router.route("/hormonal_exam").post(createHormonalBloodExam);
+
 export default router;
