@@ -76,7 +76,7 @@ export const getBiochemicalBloodExamByUserId = async (
 
 export const getAllExamsByUserId = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id }: any = req.query;
     const exams = await getUserExams(parseInt(id));
     res.status(200).send(exams);
   } catch (error) {
@@ -97,14 +97,14 @@ export const createHormonalBloodExam = async (req: Request, res: Response) => {
 
 async function getUserExams(userID: number) {
   const [row] = await sqlPool.query(
-    `select date,blood_sugar,urea,creatinine,
+    `SELECT date,blood_sugar,urea,creatinine,
     SGOT,SGPT,gamma_GT,cholesterol,triglycerides,cholesterol_HDL,
     cholesterol_LDL,albumin,total_bilirubin,direct_bilirubin,LDH,
     alkaline_phosphatase,potassium,sodium,total_calcium,iron,vitamin_B12,
     folic_acid,CRP_quantitative,ferritin,hydroxyvitamin_25_D
     from biochemical_blood_exam 
     where user_id = ?
-    ORDER BY date ASC;`,
+    `,
     [userID]
   );
   const [row2] = await sqlPool.query(
@@ -112,8 +112,7 @@ async function getUserExams(userID: number) {
     select date,thyroid_stimulating_hormone,triiodothyronine,
     free_thyroxine,anti_TPO,anti_TG,parathormone,calcitonin
     from hormonal_blood_exam
-    where user_id = ?
-    ORDER BY date ASC;`,
+    where user_id = ?`,
     [userID]
   );
 
@@ -124,19 +123,28 @@ async function getUserExams(userID: number) {
     avg_hemoglobin_density,red_cell_distribution_range,platelets,avg_platelets_volume,
     platelets_distribution_range,big_platelets
     FROM general_blood_exam
-    WHERE user_id = ?
-    ORDER BY date ASC;`,
+    WHERE user_id = ?`,
     [userID]
   );
-  //@ts-ignore
-  console.log(row, row[0]);
+  // @ts-ignore
+
   // @ts-ignore
   if (row.length > 0) {
     // @ts-ignore
-    const updatedRows = row[0].map((row: any) => {
-      row.date = new Date(row.date);
-      return row[0];
+    const dataArray = [...row, ...row2, ...row3];
+    // @ts-ignore
+
+    dataArray.sort((a, b) => {
+      a.date - b.date;
     });
+
+    let modifiedDataArray = dataArray.map((obj) => {
+      return {
+        ...obj,
+        date: new Date(obj.date),
+      };
+    });
+    return modifiedDataArray;
   }
   // @ts-ignore
   return row[0];
