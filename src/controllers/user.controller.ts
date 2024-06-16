@@ -191,7 +191,7 @@ async function getUsers(role: string) {
     `select * from ${role}
      `
   );
-  return rows[0];
+  return rows;
 }
 
 export async function createNewUser(user: any) {

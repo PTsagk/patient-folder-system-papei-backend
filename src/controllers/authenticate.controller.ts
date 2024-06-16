@@ -1,7 +1,5 @@
-import { NextFunction } from "express";
-import { Request, Response } from "express";
+import { NextFunction, Request, Response } from "express";
 import jwt from "jsonwebtoken";
-import cookie from "cookie";
 import { getAdminByIdQuery, getUserByIdQuery } from "./user.controller";
 export const authenticateController = async (
   req: Request<any>,
