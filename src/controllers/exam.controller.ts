@@ -1,6 +1,11 @@
 import { Request, Response } from "express";
 import { sqlPool } from "../mysqlPool";
 import { createNewUser, getUserByIdQuery } from "./user.controller";
+import { IBiochemicalBloodRequest } from "../models/biochemical_blood_request";
+import { IUserInfoRequest } from "../models/user_info_request";
+import { IGeneralBloodRequest } from "../models/general_blood_request";
+import { IHormonalBloodRequest } from "../models/hormonal_blood_request";
+
 export const createBiochemicalBloodExam = async (
   req: Request,
   res: Response
@@ -14,7 +19,10 @@ export const createBiochemicalBloodExam = async (
   }
 };
 
-async function createNewBiochemicalBloodExam(userInfo: any, examInfo: any) {
+async function createNewBiochemicalBloodExam(
+  userInfo: IUserInfoRequest,
+  examInfo: IBiochemicalBloodRequest
+) {
   let user;
   if (userInfo.id) {
     user = await getUserByIdQuery(userInfo.id, "user");
@@ -27,12 +35,12 @@ async function createNewBiochemicalBloodExam(userInfo: any, examInfo: any) {
     [
       examInfo.date,
       examInfo.doctor_id,
-      user.id,
+      examInfo.user_id,
       examInfo.blood_sugar,
       examInfo.urea,
       examInfo.creatinine,
-      examInfo["SGOT"],
-      examInfo["SGPT"],
+      examInfo.SGOT,
+      examInfo.SGPT,
       examInfo.gamma_GT,
       examInfo.cholesterol,
       examInfo.triglycerides,
@@ -41,7 +49,7 @@ async function createNewBiochemicalBloodExam(userInfo: any, examInfo: any) {
       examInfo.albumin,
       examInfo.total_bilirubin,
       examInfo.direct_bilirubin,
-      examInfo["LDH"],
+      examInfo.LDH,
       examInfo.alkaline_phosphatase,
       examInfo.potassium,
       examInfo.sodium,
@@ -78,7 +86,7 @@ export const getAllExamsByUserId = async (req: Request, res: Response) => {
   try {
     const { id }: any = req.query;
     const exams = await getUserExams(parseInt(id));
-    res.status(200).send(exams);
+    res.status(200).json(exams);
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
@@ -148,20 +156,25 @@ async function getUserExams(userID: number) {
   // @ts-ignore
   return row[0];
 }
-async function createNewHormonalBloodExam(userInfo: any, examInfo: any) {
+async function createNewHormonalBloodExam(
+  userInfo: IUserInfoRequest,
+  examInfo: IHormonalBloodRequest
+) {
   let user;
   if (userInfo.id) {
     user = await getUserByIdQuery(userInfo.id, "user");
   }
+
   if (!user) {
     user = await createNewUser(userInfo);
   }
+
   const [row] = await sqlPool.query(
     `insert into hormonal_blood_exam (date,	doctor_id,	user_id,	thyroid_stimulating_hormone,	triiodothyronine,	free_thyroxine,	anti_TPO,	anti_TG,	parathormone,	calcitonin) values (?,?,?,?,?,?,?,?,?,?)`,
     [
       examInfo.date,
       examInfo.doctor_id,
-      user.id,
+      examInfo.user_id,
       examInfo.thyroid_stimulating_hormone,
       examInfo.triiodothyronine,
       examInfo.free_thyroxine,
@@ -198,7 +211,10 @@ export const createGeneralBloodExam = async (req: Request, res: Response) => {
   }
 };
 
-async function createNewGenerealBloodExam(userInfo: any, examInfo: any) {
+async function createNewGenerealBloodExam(
+  userInfo: IUserInfoRequest,
+  examInfo: IGeneralBloodRequest
+) {
   let user;
   if (userInfo.id) {
     user = await getUserByIdQuery(userInfo.id, "user");
@@ -211,7 +227,7 @@ async function createNewGenerealBloodExam(userInfo: any, examInfo: any) {
     [
       examInfo.date,
       examInfo.doctor_id,
-      user.id,
+      userInfo.id,
       examInfo.white_bloodcells,
       examInfo.neutrophils,
       examInfo.lymphocytes,

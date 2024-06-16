@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
 import { sqlPool } from "../mysqlPool";
+import { IUserInfoRequest } from "../models/user_info_request";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
@@ -178,7 +179,7 @@ async function getUsers(role: string) {
   return rows;
 }
 
-export async function createNewUser(user: any) {
+export async function createNewUser(user: IUserInfoRequest) {
   const password = uuidv4();
   // @ts-ignore
 
