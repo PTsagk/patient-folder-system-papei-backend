@@ -132,22 +132,6 @@ export const userDeleteById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserPfp = async (req: Request, res: Response) => {
-  try {
-    const role = req.params.role;
-    const { image, id } = req.body;
-    const newUser = await updateUserPfpById(image, id, role);
-    //@ts-ignore
-    if (newUser.affectedRows > 0) {
-      res.status(200).json("OK");
-    } else {
-      throw new Error("Uknown error");
-    }
-  } catch (error) {
-    console.log(error);
-    res.json("Internal Server Error").status(500);
-  }
-};
 async function getUserByUsernameAndPassword(
   username: string,
   password: string
@@ -201,7 +185,7 @@ export async function createNewUser(user: any) {
   // const [row] = await sqlPool.query<IUser>(
 
   const [row] = await sqlPool.query<{ id: string }[]>(
-    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,image,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?,?)`,
+    `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)`,
     [
       user.name,
       user.surname,
@@ -217,7 +201,6 @@ export async function createNewUser(user: any) {
       user.amka,
       user.region,
       user.address_num,
-      user.image,
       user.doctor_id,
       password,
     ]
@@ -231,7 +214,7 @@ async function createNewDoctor(doctor: any) {
 
   // const [row] = await sqlPool.query<IUser>(
   const [row] = await sqlPool.query<{ id: string }[]>(
-    `insert into doctor (name, surname, email,telephone,gender,amka,image,password) values (?, ?, ?, ?, ?, ?, NULL, ?)`,
+    `insert into doctor (name, surname, email,telephone,gender,amka,password) values (?, ?,  ?, ?, ?, NULL, ?)`,
     [
       doctor.name,
       doctor.surname,
@@ -249,7 +232,7 @@ async function updateExistingUser(user: any) {
   // @ts-ignore
 
   const [row] = await sqlPool.query(
-    `update user set name=?, surname=?, email=?, country=?, city=?, street=?,telephone=?,gender=?,age=?,height=?,weight=?,amka=?,region=?,address_num=?,image=?,doctor_id=? where id=?
+    `update user set name=?, surname=?, email=?, country=?, city=?, street=?,telephone=?,gender=?,age=?,height=?,weight=?,amka=?,region=?,address_num=?,doctor_id=? where id=?
      `,
     [
       user.name,
@@ -266,7 +249,6 @@ async function updateExistingUser(user: any) {
       user.amka,
       user.region,
       user.address_num,
-      user.image,
       user.doctor_id,
       user.password,
     ]
@@ -282,12 +264,4 @@ async function deleteUserById(id: any, role: string) {
     [id]
   );
   return row;
-}
-
-async function updateUserPfpById(image: any, id: any, role: string) {
-  const [rows] = await sqlPool.query(`update ${role} set image=? where id=?`, [
-    image,
-    id,
-  ]);
-  return rows;
 }

@@ -3,7 +3,6 @@ import { authenticateAdmin } from "../controllers/authenticate.controller";
 import {
   doctorRegister,
   getAllUsers,
-  updateUserPfp,
   userAuth,
   userDeleteById,
   userLogin,
@@ -22,7 +21,5 @@ router.route("/update_user").put(authenticateAdmin, userUpdate);
 router.route("/delete/:role").all(authenticateAdmin).delete(userDeleteById);
 
 router.route("/view/all/:role").all(authenticateAdmin).get(getAllUsers);
-
-router.route("/update_pfp/:role").patch(updateUserPfp);
 
 export default router;
