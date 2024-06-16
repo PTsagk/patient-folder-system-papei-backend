@@ -68,6 +68,16 @@ export const userAuth = async (req: Request, res: Response) => {
   }
 };
 
+export const userLogout = async (req: Request, res: Response) => {
+  try {
+    res.clearCookie("auth");
+    res.json("OK").status(200);
+  } catch (error) {
+    console.log(error);
+    res.json("Internal Server Error").status(500);
+  }
+};
+
 export const userRegister = async (req: Request, res: Response) => {
   try {
     await createNewUser(req.body);

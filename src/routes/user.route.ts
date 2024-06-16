@@ -7,12 +7,14 @@ import {
   userAuth,
   userDeleteById,
   userLogin,
+  userLogout,
   userRegister,
   userUpdate,
 } from "../controllers/user.controller";
 const router = express.Router();
 router.route("/login").post(userLogin);
 router.route("/auth").get(userAuth);
+router.route("/logout").get(userLogout);
 router.route("/register_user").post(userRegister);
 router.route("/register_doctor").post(doctorRegister);
 //@ts-ignore
