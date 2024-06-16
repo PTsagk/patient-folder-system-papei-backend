@@ -126,7 +126,6 @@ async function getUserExams(userID: number) {
     WHERE user_id = ?`,
     [userID]
   );
-  // @ts-ignore
 
   // @ts-ignore
   if (row.length > 0) {
