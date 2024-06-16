@@ -187,3 +187,66 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
     res.send("Internal Server Error").status(500);
   }
 };
+
+export const createGeneralBloodExam = async (req: Request, res: Response) => {
+  try {
+    await createNewGenerealBloodExam(req.body.userInfo, req.body.examInfo);
+    res.json("OK").status(200);
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+  }
+};
+
+async function createNewGenerealBloodExam(userInfo: any, examInfo: any) {
+  let user;
+  if (userInfo.id) {
+    user = await getUserByIdQuery(userInfo.id, "user");
+  }
+  if (!user) {
+    user = await createNewUser(userInfo);
+  }
+  const [row] = await sqlPool.query(
+    `insert into general_blood_exam (date,doctor_id,user_id,white_bloodcells,neutrophils,lymphocytes, single_cells,eosinophils,basophils,red_blood_cells,hemoglobin,hematocrit,avg_red_cells_volume,avg_hemoglobin_content,avg_hemoglobin_density,red_cell_distribution_range,platelets,avg_platelets_volume,platelets_distribution_range,big_platelets) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    [
+      examInfo.date,
+      examInfo.doctor_id,
+      user.id,
+      examInfo.white_bloodcells,
+      examInfo.neutrophils,
+      examInfo.lymphocytes,
+      examInfo.single_cells,
+      examInfo.eosinophils,
+      examInfo.basophils,
+      examInfo.red_blood_cells,
+      examInfo.hemoglobin,
+      examInfo.hematocrit,
+      examInfo.avg_red_cells_volume,
+      examInfo.avg_hemoglobin_content,
+      examInfo.avg_hemoglobin_density,
+      examInfo.red_cell_distribution_range,
+      examInfo.platelets,
+      examInfo.avg_platelets_volume,
+      examInfo.platelets_distribution_range,
+      examInfo.big_platelets,
+    ]
+  );
+  return row;
+}
+
+export const getGeneralBloodExamByUserId = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.params;
+    const [row] = await sqlPool.query(
+      `select * from general_blood_exam where user_id = ?`,
+      [id]
+    );
+    res.json(row).status(200);
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+  }
+};
