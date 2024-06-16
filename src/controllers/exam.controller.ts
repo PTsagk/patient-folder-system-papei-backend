@@ -62,7 +62,7 @@ export const getBiochemicalBloodExamByUserId = async (
   res: Response
 ) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const [row] = await sqlPool.query(
       `select * from biochemical_blood_exam where user_id = ?`,
       [id]
