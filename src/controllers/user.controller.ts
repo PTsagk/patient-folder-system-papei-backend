@@ -1,8 +1,8 @@
 import { Request, Response } from "express";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid";
-import { sqlPool } from "../mysqlPool";
 import { IUserInfoRequest } from "../models/user_info_request";
+import { sqlPool } from "../mysqlPool";
 
 export const userLogin = async (req: Request, res: Response) => {
   try {
@@ -81,29 +81,47 @@ export const userLogout = async (req: Request, res: Response) => {
 
 export const userRegister = async (req: Request, res: Response) => {
   try {
+    const { email } = req.body;
+    let user =
+      (await getUserByEmailQuery(email, "user")) ??
+      (await getUserByEmailQuery(email, "doctor")) ??
+      (await getUserByEmailQuery(email, "admin"));
+    if (user) {
+      throw new Error("Email already in use");
+      return;
+    }
     await createNewUser(req.body);
     res.json("OK").status(200);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
-    res.json("Internal Server Error").status(500);
+    res.status(500).json(error.message);
   }
 };
+
 export const doctorRegister = async (req: Request, res: Response) => {
   try {
+    const { email } = req.body;
+    let user =
+      (await getUserByEmailQuery(email, "user")) ??
+      (await getUserByEmailQuery(email, "doctor")) ??
+      (await getUserByEmailQuery(email, "admin"));
+    if (user) {
+      throw new Error("Email already in use");
+    }
     await createNewDoctor(req.body);
     res.json("OK").status(200);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
-    res.json("Internal Server Error").status(500);
+    res.status(500).json(error.message);
   }
 };
 export const userUpdate = async (req: Request, res: Response) => {
   try {
     await updateExistingUser(req.body);
     res.json("OK").status(200);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
-    res.json("Internal Server Error").status(500);
+    res.status(500).json(error.message);
   }
 };
 
@@ -112,9 +130,9 @@ export const getAllUsers = async (req: Request, res: Response) => {
     const role = req.params.role;
     const usersList = await getUsers(role);
     res.json(usersList).status(200);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
-    res.json("Internal Server Error").status(500);
+    res.status(500).json(error.message);
   }
 };
 
@@ -127,9 +145,9 @@ export const userDeleteById = async (req: Request, res: Response) => {
       throw new Error("User not found");
     }
     res.json("Deletion Successful").status(200);
-  } catch (error) {
+  } catch (error: any) {
     console.log(error);
-    res.json("Internal Server Error").status(500);
+    res.status(500).json(error.message);
   }
 };
 
@@ -148,13 +166,24 @@ async function getUserByUsernameAndPassword(
   return rows[0][0];
 }
 
-export async function getUserByIdQuery(id: number, role: string) {
+export async function getUserByIdQuery(id: number, role: userRole) {
   // @ts-ignore
 
   const [rows] = await sqlPool.query(
     `select * from ${role} where id=?
     `,
     [id]
+  );
+  // @ts-ignore
+  return rows[0];
+}
+export async function getUserByEmailQuery(email: number, role: userRole) {
+  // @ts-ignore
+
+  const [rows] = await sqlPool.query(
+    `select * from ${role} where email=?
+    `,
+    [email]
   );
   // @ts-ignore
   return rows[0];
@@ -215,7 +244,7 @@ async function createNewDoctor(doctor: any) {
 
   // const [row] = await sqlPool.query<IUser>(
   const [row] = await sqlPool.query<{ id: string }[]>(
-    `insert into doctor (name, surname, email,telephone,gender,amka,password) values (?, ?,  ?, ?, ?, NULL, ?)`,
+    `insert into doctor (name, surname, email,telephone,gender,amka,password) values (?, ?,  ?, ?, ?, ?, ?)`,
     [
       doctor.name,
       doctor.surname,
@@ -266,3 +295,5 @@ async function deleteUserById(id: any, role: string) {
   );
   return row;
 }
+
+export type userRole = "admin" | "doctor" | "user";
