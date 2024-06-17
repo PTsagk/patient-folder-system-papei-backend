@@ -3,7 +3,10 @@ import { sqlPool } from "../mysqlPool";
 import { createNewUser, getUserByIdQuery } from "./user.controller";
 import { IBiochemicalBloodRequest } from "../models/biochemical_blood_request";
 import { IUserInfoRequest } from "../models/user_info_request";
-import { IGeneralBloodRequest } from "../models/general_blood_request";
+import {
+  IGeneralBloodRequest,
+  checkAllBloodTestResults,
+} from "../models/general_blood_request";
 import { IHormonalBloodRequest } from "../models/hormonal_blood_request";
 
 export const createBiochemicalBloodExam = async (
@@ -309,7 +312,11 @@ export const getGeneralBloodExamByUserId = async (
           date: new Date(obj.date),
         };
       });
-      res.json(modifiedDataArray).status(200);
+
+      // @ts-ignore
+      const allCriticalValues = checkAllBloodTestResults(row);
+
+      res.json([modifiedDataArray, allCriticalValues]).status(200);
       return;
     }
     res.json(row).status(200);
