@@ -33,12 +33,15 @@ export const userLogin = async (req: Request, res: Response) => {
         expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
       });
       res.json(user[0]).status(200);
+      return;
     } else {
       res.status(404).json("User not found");
+      return;
     }
   } catch (error) {
     console.log(error);
     res.status(500).json("Internal Server Error");
+    return;
   }
 };
 export const userAuth = async (req: Request, res: Response) => {
@@ -62,10 +65,12 @@ export const userAuth = async (req: Request, res: Response) => {
       });
     } else {
       res.status(404).json("No auth");
+      return;
     }
   } catch (error) {
     console.log(error);
     res.json("Internal Server Error").status(500);
+    return;
   }
 };
 
@@ -73,9 +78,11 @@ export const userLogout = async (req: Request, res: Response) => {
   try {
     res.clearCookie("auth");
     res.json("OK").status(200);
+    return;
   } catch (error) {
     console.log(error);
     res.json("Internal Server Error").status(500);
+    return;
   }
 };
 
@@ -163,7 +170,7 @@ async function getUserByUsernameAndPassword(
     [username, password]
   );
   //@ts-ignore
-  return rows[0][0];
+  return rows[0];
 }
 
 export async function getUserByIdQuery(id: number, role: userRole) {

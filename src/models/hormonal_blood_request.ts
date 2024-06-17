@@ -1,5 +1,4 @@
 export interface IHormonalBloodRequest {
-  date: number;
   doctor_id: number;
   user_id: number;
   thyroid_stimulating_hormone: number;
