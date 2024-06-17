@@ -221,7 +221,9 @@ export async function createNewUser(user: IUserInfoRequest) {
 
   // const [row] = await sqlPool.query<IUser>(
 
-  const [row] = await sqlPool.query<{ id: string }[]>(
+  console.log(user);
+
+  const [row] = await sqlPool.query<any>(
     `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)`,
     [
       user.name,
@@ -242,6 +244,7 @@ export async function createNewUser(user: IUserInfoRequest) {
       password,
     ]
   );
+  console.log(row, "row");
   return row;
 }
 

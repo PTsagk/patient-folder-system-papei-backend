@@ -1,20 +1,27 @@
 import { Request, Response } from "express";
-import { sqlPool } from "../mysqlPool";
-import { createNewUser, getUserByIdQuery } from "./user.controller";
 import { IBiochemicalBloodRequest } from "../models/biochemical_blood_request";
-import { IUserInfoRequest } from "../models/user_info_request";
 import {
   IGeneralBloodRequest,
   checkAllBloodTestResults,
 } from "../models/general_blood_request";
 import { IHormonalBloodRequest } from "../models/hormonal_blood_request";
+import { IUserInfoRequest } from "../models/user_info_request";
+import { sqlPool } from "../mysqlPool";
+import { createNewUser, getUserByIdQuery } from "./user.controller";
 
 export const createBiochemicalBloodExam = async (
   req: Request,
   res: Response
 ) => {
   try {
-    await createNewBiochemicalBloodExam(req.body.userInfo, req.body.examInfo);
+    if (!!!req.body.examInfo) {
+      throw new Error("Missing hormonal exam info");
+    }
+    await createNewBiochemicalBloodExam(
+      req.body.userInfo,
+      req.body.examInfo,
+      res.locals.id
+    );
     res.json("OK").status(200);
   } catch (error) {
     console.log(error);
@@ -24,7 +31,8 @@ export const createBiochemicalBloodExam = async (
 
 async function createNewBiochemicalBloodExam(
   userInfo: IUserInfoRequest,
-  examInfo: IBiochemicalBloodRequest
+  examInfo: IBiochemicalBloodRequest,
+  doctor_id: number
 ) {
   const date = new Date().getTime();
   let user;
@@ -32,15 +40,15 @@ async function createNewBiochemicalBloodExam(
     user = await getUserByIdQuery(userInfo.id, "user");
   }
   if (!user) {
-    user = await createNewUser(userInfo);
+    user = await createNewUser({ ...userInfo, doctor_id: doctor_id });
   }
   const [row] = await sqlPool.query(
     `insert into biochemical_blood_exam (date,user_age,doctor_id,user_id,blood_sugar,urea,creatinine,SGOT,SGPT,gamma_GT,cholesterol,triglycerides,cholesterol_HDL,cholesterol_LDL,albumin,total_bilirubin,direct_bilirubin,LDH,alkaline_phosphatase,potassium,sodium,total_calcium,iron,vitamin_B12,folic_acid,CRP_quantitative,ferritin,hydroxyvitamin_25_D) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
       date,
       userInfo.age,
-      examInfo.doctor_id,
-      examInfo.user_id,
+      doctor_id,
+      user.insertId,
       examInfo.blood_sugar,
       examInfo.urea,
       examInfo.creatinine,
@@ -116,11 +124,16 @@ export const getAllExamsByUserId = async (req: Request, res: Response) => {
 // hormonal blood exams
 export const createHormonalBloodExam = async (req: Request, res: Response) => {
   try {
-    await createNewHormonalBloodExam(req.body.userInfo, req.body.examInfo);
+    const { userInfo, examInfo } = req.body;
+    console.log(userInfo, examInfo, !!!examInfo);
+    if (!!!examInfo) {
+      throw new Error("Missing hormonal exam info");
+    }
+    await createNewHormonalBloodExam(userInfo, examInfo, res.locals.id);
     res.json("OK").status(200);
     return;
   } catch (error) {
-    console.log(error);
+    // console.log(error);
     res.send("Internal Server Error").status(500);
     return;
   }
@@ -181,25 +194,29 @@ async function getUserExams(userID: number) {
 }
 async function createNewHormonalBloodExam(
   userInfo: IUserInfoRequest,
-  examInfo: IHormonalBloodRequest
+  examInfo: IHormonalBloodRequest,
+  doctor_id: number
 ) {
   const date = new Date().getTime();
   let user;
   if (userInfo.id) {
     user = await getUserByIdQuery(userInfo.id, "user");
   }
-
+  console.log(doctor_id, user);
   if (!user) {
-    user = await createNewUser(userInfo);
+    user = await createNewUser({ ...userInfo, doctor_id: doctor_id });
   }
+
+  console.log(user);
+  console.log(user.insertId);
 
   const [row] = await sqlPool.query(
     `insert into hormonal_blood_exam (date,user_age,doctor_id,user_id,thyroid_stimulating_hormone,triiodothyronine,free_thyroxine,anti_TPO,anti_TG,parathormone,calcitonin) values (?,?,?,?,?,?,?,?,?,?,?)`,
     [
       date,
       userInfo.age,
-      examInfo.doctor_id,
-      examInfo.user_id,
+      doctor_id,
+      user.insertId,
       examInfo.thyroid_stimulating_hormone,
       examInfo.triiodothyronine,
       examInfo.free_thyroxine,
@@ -209,6 +226,7 @@ async function createNewHormonalBloodExam(
       examInfo.calcitonin,
     ]
   );
+
   return row;
 }
 
@@ -242,7 +260,14 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
 
 export const createGeneralBloodExam = async (req: Request, res: Response) => {
   try {
-    await createNewGenerealBloodExam(req.body.userInfo, req.body.examInfo);
+    if (!!!req.body.examInfo) {
+      throw new Error("Missing hormonal exam info");
+    }
+    await createNewGenerealBloodExam(
+      req.body.userInfo,
+      req.body.examInfo,
+      res.locals.id
+    );
     res.json("OK").status(200);
     return;
   } catch (error) {
@@ -254,7 +279,8 @@ export const createGeneralBloodExam = async (req: Request, res: Response) => {
 
 async function createNewGenerealBloodExam(
   userInfo: IUserInfoRequest,
-  examInfo: IGeneralBloodRequest
+  examInfo: IGeneralBloodRequest,
+  doctor_id: number
 ) {
   const date = new Date().getTime();
   let user;
@@ -262,15 +288,16 @@ async function createNewGenerealBloodExam(
     user = await getUserByIdQuery(userInfo.id, "user");
   }
   if (!user) {
-    user = await createNewUser(userInfo);
+    user = await createNewUser({ ...userInfo, doctor_id: doctor_id });
   }
+  console.log("user", user);
   const [row] = await sqlPool.query(
     `insert into general_blood_exam (date,user_age,doctor_id,user_id,white_bloodcells,neutrophils,lymphocytes, single_cells,eosinophils,basophils,red_blood_cells,hemoglobin,hematocrit,avg_red_cells_volume,avg_hemoglobin_content,avg_hemoglobin_density,red_cell_distribution_range,platelets,avg_platelets_volume,platelets_distribution_range,big_platelets) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
       date,
       userInfo.age,
-      examInfo.doctor_id,
-      examInfo.user_id,
+      doctor_id,
+      user.insertId,
       examInfo.white_bloodcells,
       examInfo.neutrophils,
       examInfo.lymphocytes,
