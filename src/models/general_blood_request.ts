@@ -1,5 +1,4 @@
 export interface IGeneralBloodRequest {
-  date: number;
   doctor_id: number;
   user_id: number;
   white_bloodcells: number;

@@ -23,6 +23,7 @@ async function createNewBiochemicalBloodExam(
   userInfo: IUserInfoRequest,
   examInfo: IBiochemicalBloodRequest
 ) {
+  const date = new Date().getTime();
   let user;
   if (userInfo.id) {
     user = await getUserByIdQuery(userInfo.id, "user");
@@ -31,9 +32,10 @@ async function createNewBiochemicalBloodExam(
     user = await createNewUser(userInfo);
   }
   const [row] = await sqlPool.query(
-    `insert into biochemical_blood_exam (date,doctor_id,user_id,blood_sugar,urea,creatinine, SGOT,SGPT,gamma_GT,cholesterol,triglycerides,cholesterol_HDL,cholesterol_LDL,albumin,total_bilirubin,direct_bilirubin,LDH,alkaline_phosphatase,potassium,sodium,total_calcium,iron,vitamin_B12,folic_acid,CRP_quantitative,ferritin,hydroxyvitamin_25_D) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    `insert into biochemical_blood_exam (date,user_age,doctor_id,user_id,blood_sugar,urea,creatinine,SGOT,SGPT,gamma_GT,cholesterol,triglycerides,cholesterol_HDL,cholesterol_LDL,albumin,total_bilirubin,direct_bilirubin,LDH,alkaline_phosphatase,potassium,sodium,total_calcium,iron,vitamin_B12,folic_acid,CRP_quantitative,ferritin,hydroxyvitamin_25_D) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
-      examInfo.date,
+      date,
+      userInfo.age,
       examInfo.doctor_id,
       examInfo.user_id,
       examInfo.blood_sugar,
@@ -160,6 +162,7 @@ async function createNewHormonalBloodExam(
   userInfo: IUserInfoRequest,
   examInfo: IHormonalBloodRequest
 ) {
+  const date = new Date().getTime();
   let user;
   if (userInfo.id) {
     user = await getUserByIdQuery(userInfo.id, "user");
@@ -170,9 +173,10 @@ async function createNewHormonalBloodExam(
   }
 
   const [row] = await sqlPool.query(
-    `insert into hormonal_blood_exam (date,	doctor_id,	user_id,	thyroid_stimulating_hormone,	triiodothyronine,	free_thyroxine,	anti_TPO,	anti_TG,	parathormone,	calcitonin) values (?,?,?,?,?,?,?,?,?,?)`,
+    `insert into hormonal_blood_exam (date,user_age,doctor_id,user_id,thyroid_stimulating_hormone,triiodothyronine,free_thyroxine,anti_TPO,anti_TG,parathormone,calcitonin) values (?,?,?,?,?,?,?,?,?,?,?)`,
     [
-      examInfo.date,
+      date,
+      userInfo.age,
       examInfo.doctor_id,
       examInfo.user_id,
       examInfo.thyroid_stimulating_hormone,
@@ -215,6 +219,7 @@ async function createNewGenerealBloodExam(
   userInfo: IUserInfoRequest,
   examInfo: IGeneralBloodRequest
 ) {
+  const date = new Date().getTime();
   let user;
   if (userInfo.id) {
     user = await getUserByIdQuery(userInfo.id, "user");
@@ -223,11 +228,12 @@ async function createNewGenerealBloodExam(
     user = await createNewUser(userInfo);
   }
   const [row] = await sqlPool.query(
-    `insert into general_blood_exam (date,doctor_id,user_id,white_bloodcells,neutrophils,lymphocytes, single_cells,eosinophils,basophils,red_blood_cells,hemoglobin,hematocrit,avg_red_cells_volume,avg_hemoglobin_content,avg_hemoglobin_density,red_cell_distribution_range,platelets,avg_platelets_volume,platelets_distribution_range,big_platelets) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
+    `insert into general_blood_exam (date,user_age,doctor_id,user_id,white_bloodcells,neutrophils,lymphocytes, single_cells,eosinophils,basophils,red_blood_cells,hemoglobin,hematocrit,avg_red_cells_volume,avg_hemoglobin_content,avg_hemoglobin_density,red_cell_distribution_range,platelets,avg_platelets_volume,platelets_distribution_range,big_platelets) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
-      examInfo.date,
+      date,
+      userInfo.age,
       examInfo.doctor_id,
-      userInfo.id,
+      examInfo.user_id,
       examInfo.white_bloodcells,
       examInfo.neutrophils,
       examInfo.lymphocytes,

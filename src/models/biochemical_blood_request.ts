@@ -1,5 +1,4 @@
 export interface IBiochemicalBloodRequest {
-  date: number;
   doctor_id: number;
   user_id: number;
   blood_sugar: number;
