@@ -232,7 +232,7 @@ async function createNewHormonalBloodExam(
 
 export const getHormonalBloodExamById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const [row] = await sqlPool.query(
       `select * from hormonal_blood_exam where user_id = ? order by date desc`,
       [id]
@@ -325,7 +325,7 @@ export const getGeneralBloodExamByUserId = async (
   res: Response
 ) => {
   try {
-    const { id } = req.params;
+    const { id } = req.query;
     const [row] = await sqlPool.query(
       `select * from general_blood_exam where user_id = ? order by date desc`,
       [id]
