@@ -74,13 +74,27 @@ export const getBiochemicalBloodExamByUserId = async (
   try {
     const { id } = req.query;
     const [row] = await sqlPool.query(
-      `select * from biochemical_blood_exam where user_id = ?`,
+      `select * from biochemical_blood_exam where user_id = ? order by date desc`,
       [id]
     );
+    //@ts-ignore
+    if (row.length > 0) {
+      //@ts-ignore
+      let modifiedDataArray = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+      });
+      res.json(modifiedDataArray).status(200);
+      return;
+    }
     res.json(row).status(200);
+    return;
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
+    return;
   }
 };
 
@@ -89,9 +103,11 @@ export const getAllExamsByUserId = async (req: Request, res: Response) => {
     const { id }: any = req.query;
     const exams = await getUserExams(parseInt(id));
     res.status(200).json(exams);
+    return;
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
+    return;
   }
 };
 // hormonal blood exams
@@ -99,9 +115,11 @@ export const createHormonalBloodExam = async (req: Request, res: Response) => {
   try {
     await createNewHormonalBloodExam(req.body.userInfo, req.body.examInfo);
     res.json("OK").status(200);
+    return;
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
+    return;
   }
 };
 
@@ -144,7 +162,7 @@ async function getUserExams(userID: number) {
     // @ts-ignore
 
     dataArray.sort((a, b) => {
-      a.date - b.date;
+      b.date - a.date;
     });
 
     let modifiedDataArray = dataArray.map((obj) => {
@@ -195,13 +213,27 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const [row] = await sqlPool.query(
-      `select * from hormonal_blood_exam where user_id = ?`,
+      `select * from hormonal_blood_exam where user_id = ? order by date desc`,
       [id]
     );
+    //@ts-ignore
+    if (row.length > 0) {
+      //@ts-ignore
+      let modifiedDataArray = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+      });
+      res.json(modifiedDataArray).status(200);
+      return;
+    }
     res.json(row).status(200);
+    return;
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
+    return;
   }
 };
 
@@ -209,9 +241,11 @@ export const createGeneralBloodExam = async (req: Request, res: Response) => {
   try {
     await createNewGenerealBloodExam(req.body.userInfo, req.body.examInfo);
     res.json("OK").status(200);
+    return;
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
+    return;
   }
 };
 
@@ -263,12 +297,26 @@ export const getGeneralBloodExamByUserId = async (
   try {
     const { id } = req.params;
     const [row] = await sqlPool.query(
-      `select * from general_blood_exam where user_id = ?`,
+      `select * from general_blood_exam where user_id = ? order by date desc`,
       [id]
     );
+    //@ts-ignore
+    if (row.length > 0) {
+      //@ts-ignore
+      let modifiedDataArray = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+      });
+      res.json(modifiedDataArray).status(200);
+      return;
+    }
     res.json(row).status(200);
+    return;
   } catch (error) {
     console.log(error);
     res.send("Internal Server Error").status(500);
+    return;
   }
 };
