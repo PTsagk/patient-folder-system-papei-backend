@@ -41,22 +41,14 @@ async function createNewBiochemicalBloodExam(
   doctor_id: number
 ) {
   const date = new Date().getTime();
-  let user = await getUserByEmailQuery(userInfo.email, "user");
-  // if (userInfo.id) {
-  //   user = await getUserByIdQuery(userInfo.id, "user");
-  // }
-  if (!user) {
-    user = await createNewUser({ ...userInfo, doctor_id: doctor_id });
-  }
 
-  const userId = user.id ?? user.insertId;
   const [row] = await sqlPool.query(
     `insert into biochemical_blood_exam (date,user_age,doctor_id,user_id,blood_sugar,urea,creatinine,SGOT,SGPT,gamma_GT,cholesterol,triglycerides,cholesterol_HDL,cholesterol_LDL,albumin,total_bilirubin,direct_bilirubin,LDH,alkaline_phosphatase,potassium,sodium,total_calcium,iron,vitamin_B12,folic_acid,CRP_quantitative,ferritin,hydroxyvitamin_25_D) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
       date,
       userInfo.age,
       doctor_id,
-      userId,
+      userInfo.id,
       examInfo.blood_sugar,
       examInfo.urea,
       examInfo.creatinine,
@@ -363,15 +355,6 @@ async function createNewHormonalBloodExam(
   doctor_id: number
 ) {
   const date = new Date().getTime();
-  let user = await getUserByEmailQuery(userInfo.email, "user");
-  // if (userInfo.id) {
-  //   user = await getUserByIdQuery(userInfo.id, "user");
-  // }
-  if (!user) {
-    user = await createNewUser({ ...userInfo, doctor_id: doctor_id });
-  }
-
-  const userId = user.id ?? user.insertId;
 
   try {
     const [row] = await sqlPool.query(
@@ -380,7 +363,7 @@ async function createNewHormonalBloodExam(
         date,
         userInfo.age,
         doctor_id,
-        userId,
+        userInfo.id,
         examInfo.thyroid_stimulating_hormone,
         examInfo.triiodothyronine,
         examInfo.free_thyroxine,
@@ -454,22 +437,13 @@ async function createNewGenerealBloodExam(
   doctor_id: number
 ) {
   const date = new Date().getTime();
-  let user = await getUserByEmailQuery(userInfo.email, "user");
-  // if (userInfo.id) {
-  //   user = await getUserByIdQuery(userInfo.id, "user");
-  // }
-  if (!user) {
-    user = await createNewUser({ ...userInfo, doctor_id: doctor_id });
-  }
-
-  const userId = user.id ?? user.insertId;
   const [row] = await sqlPool.query(
     `insert into general_blood_exam (date,user_age,doctor_id,user_id,white_bloodcells,neutrophils,lymphocytes, single_cells,eosinophils,basophils,red_blood_cells,hemoglobin,hematocrit,avg_red_cells_volume,avg_hemoglobin_content,avg_hemoglobin_density,red_cell_distribution_range,platelets,avg_platelets_volume,platelets_distribution_range,big_platelets) values (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)`,
     [
       date,
       userInfo.age,
       doctor_id,
-      userId,
+      userInfo.id,
       examInfo.white_bloodcells,
       examInfo.neutrophils,
       examInfo.lymphocytes,
@@ -519,6 +493,54 @@ export const getGeneralBloodExamByUserId = async (
       return;
     }
     res.json(row).status(200);
+    return;
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+    return;
+  }
+};
+
+export const createAll3Exams = async (req: Request, res: Response) => {
+  try {
+    if (
+      !!!req.body.general_exam &&
+      !!!req.body.hormonal_exam &&
+      !!!req.body.biochemical_exam
+    ) {
+      throw new Error("Missing exam info");
+    }
+    let user = await getUserByEmailQuery(req.body.userInfo.email, "user");
+    let user_exists = true;
+    if (!!!user) {
+      user = await createNewUser({
+        ...req.body.userInfo,
+        doctor_id: res.locals.id,
+      });
+      user_exists = false;
+    }
+    if (!!!!!!!!req.body.hormonal_exam) {
+      await createNewHormonalBloodExam(
+        user,
+        req.body.hormonal_exam,
+        res.locals.id
+      );
+    }
+    if (!!!!!!!!!!req.body.general_exam) {
+      await createNewGenerealBloodExam(
+        user,
+        req.body.general_exam,
+        res.locals.id
+      );
+    }
+    if (!!!!!!!!!!req.body.biochemical_exam) {
+      await createNewBiochemicalBloodExam(
+        user,
+        req.body.biochemical_exam,
+        res.locals.id
+      );
+    }
+    res.json(user_exists).status(200);
     return;
   } catch (error) {
     console.log(error);
