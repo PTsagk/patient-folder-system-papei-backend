@@ -3,7 +3,7 @@ import { sqlPool } from "../mysqlPool";
 import { createNewUser, getUserByIdQuery } from "./user.controller";
 import {
   IBiochemicalBloodRequest,
-  checkAllBiochemicalTestResults,
+  checkAllBiochemicalBloodTestResults,
 } from "../models/biochemical_blood_request";
 import { IUserInfoRequest } from "../models/user_info_request";
 import {
@@ -12,7 +12,7 @@ import {
 } from "../models/general_blood_request";
 import {
   IHormonalBloodRequest,
-  checkAllHormonalTestResults,
+  checkAllHormonalBloodTestResults,
 } from "../models/hormonal_blood_request";
 
 export const createBiochemicalBloodExam = async (
@@ -96,7 +96,7 @@ export const getBiochemicalBloodExamByUserId = async (
         };
       });
       const biochemical_blood_results =
-        checkAllBiochemicalTestResults(modifiedDataArray);
+        checkAllBiochemicalBloodTestResults(modifiedDataArray);
       res.json([modifiedDataArray, biochemical_blood_results]).status(200);
       return;
     }
@@ -167,25 +167,63 @@ async function getUserExams(userID: number) {
   );
 
   // @ts-ignore
-  if (row.length > 0) {
-    // @ts-ignore
-    const dataArray = [...row, ...row2, ...row3];
-    // @ts-ignore
+  if (row.length > 0 || row2.length > 0 || row3.length > 0) {
+    {
+      // @ts-ignore
+      let modifiedDataArray1 = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+      });
+      const biochemical_blood_results =
+        checkAllBiochemicalBloodTestResults(modifiedDataArray1);
+      // @ts-ignore
+      let modifiedDataArray2 = row2.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+        const hormonal_blood_results =
+          checkAllHormonalBloodTestResults(modifiedDataArray2);
+      });
+      // @ts-ignore
+      let modifiedDataArray3 = row3.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+        const general_blood_results =
+          checkAllGeneralBloodTestResults(modifiedDataArray1);
+      });
+      const data2Array = [
+        ...modifiedDataArray1,
+        ...modifiedDataArray2,
+        ...modifiedDataArray3,
+      ];
+      // @ts-ignore
+      data2Array.sort((a, b) => {
+        b.date - a.date;
+      });
+      // @ts-ignore
+      const dataArray = [...row, ...row2, ...row3];
+      // @ts-ignore
+      dataArray.sort((a, b) => {
+        b.date - a.date;
+      });
 
-    dataArray.sort((a, b) => {
-      b.date - a.date;
-    });
+      let modifiedDataArray = dataArray.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+      });
 
-    let modifiedDataArray = dataArray.map((obj) => {
-      return {
-        ...obj,
-        date: new Date(obj.date),
-      };
-    });
-    return modifiedDataArray;
+      return [modifiedDataArray, data2Array];
+    }
+    // @ts-ignore
+    return row[0];
   }
-  // @ts-ignore
-  return row[0];
 }
 async function createNewHormonalBloodExam(
   userInfo: IUserInfoRequest,
@@ -238,7 +276,7 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
       });
       // @ts-ignore
       const hormonal_blood_results =
-        checkAllHormonalTestResults(modifiedDataArray);
+        checkAllHormonalBloodTestResults(modifiedDataArray);
 
       res.json([modifiedDataArray, hormonal_blood_results]).status(200);
       return;

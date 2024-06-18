@@ -326,7 +326,7 @@ export function checkCriticalValuesForBiochemicalBloodExam(
   return criticalValues;
 }
 
-export function checkAllBiochemicalTestResults(
+export function checkAllBiochemicalBloodTestResults(
   testResultsArray: BiochemicalBloodExamResults[]
 ): SubstanceCriticalValueForBiochemicalBloodExam[][] {
   return testResultsArray.map((testResult) =>

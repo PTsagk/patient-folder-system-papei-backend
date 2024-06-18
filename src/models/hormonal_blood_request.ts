@@ -174,7 +174,7 @@ export function checkCriticalValuesForHormonalBloodExam(
   return criticalValues;
 }
 
-export function checkAllHormonalTestResults(
+export function checkAllHormonalBloodTestResults(
   testResultsArray: HormonalBloodExamResults[]
 ): SubstanceCriticalValueForHormonalBloodExam[][] {
   return testResultsArray.map((testResult) =>
