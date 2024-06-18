@@ -511,13 +511,13 @@ export const createAll3Exams = async (req: Request, res: Response) => {
       throw new Error("Missing exam info");
     }
     let user = await getUserByEmailQuery(req.body.userInfo.email, "user");
-    let user_exists = true;
+    let user_created = false;
     if (!!!user) {
       user = await createNewUser({
         ...req.body.userInfo,
         doctor_id: res.locals.id,
       });
-      user_exists = false;
+      user_created = true;
     }
     if (!!!!!!!!req.body.hormonal_exam) {
       await createNewHormonalBloodExam(
@@ -540,7 +540,7 @@ export const createAll3Exams = async (req: Request, res: Response) => {
         res.locals.id
       );
     }
-    res.json(user_exists).status(200);
+    res.json({ user_created }).status(200);
     return;
   } catch (error) {
     console.log(error);
