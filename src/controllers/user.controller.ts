@@ -355,7 +355,6 @@ async function partiaUpdateExistingUser(user: any) {
       amka = ?, 
       region = ?, 
       address_num = ?, 
-      doctor_id = ?, 
       password = ? 
      WHERE id = ?`,
     [
@@ -372,7 +371,6 @@ async function partiaUpdateExistingUser(user: any) {
       user.amka,
       user.region,
       user.address_num,
-      user.doctor_id,
       user.password,
       user.id,
     ]
