@@ -145,7 +145,15 @@ export const userUpdate = async (req: Request, res: Response) => {
     res.status(500).json(error.message);
   }
 };
-
+export const partialUserUpdate = async (req: Request, res: Response) => {
+  try {
+    await partiaUpdateExistingUser(req.body);
+    res.json("OK").status(200);
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json(error.message);
+  }
+};
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const role = req.params.role;
@@ -303,6 +311,48 @@ async function updateExistingUser(user: any) {
       user.address_num,
       user.doctor_id,
       user.password,
+    ]
+  );
+  return row;
+}
+
+async function partiaUpdateExistingUser(user: any) {
+  // @ts-ignore
+  const [row] = await sqlPool.query(
+    `UPDATE user SET 
+      name = ?, 
+      surname = ?, 
+      email = ?, 
+      country = ?, 
+      city = ?, 
+      street = ?, 
+      telephone = ?, 
+      age = ?, 
+      height = ?, 
+      weight = ?, 
+      amka = ?, 
+      region = ?, 
+      address_num = ?, 
+      doctor_id = ?, 
+      password = ? 
+     WHERE id = ?`,
+    [
+      user.name,
+      user.surname,
+      user.email,
+      user.country,
+      user.city,
+      user.street,
+      user.telephone,
+      user.age,
+      user.height,
+      user.weight,
+      user.amka,
+      user.region,
+      user.address_num,
+      user.doctor_id,
+      user.password,
+      user.id,
     ]
   );
   return row;
