@@ -146,6 +146,16 @@ export const userUpdate = async (req: Request, res: Response) => {
   }
 };
 
+export const doctorUpdate = async (req: Request, res: Response) => {
+  try {
+    await updateExistingDoctor(req.body);
+    res.json("Information Updated").status(200);
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json(error.message);
+  }
+};
+
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
     const role = req.params.role;
@@ -304,6 +314,17 @@ async function updateExistingUser(user: any) {
       user.doctor_id,
       user.password,
     ]
+  );
+  return row;
+}
+
+async function updateExistingDoctor(user: any) {
+  // @ts-ignore
+
+  const [row] = await sqlPool.query(
+    `update doctor set name=?, surname=?, email=?, telephone=?, amka=? where id=?
+     `,
+    [user.name, user.surname, user.email, user.telephone, user.amka, user.id]
   );
   return row;
 }
