@@ -5,9 +5,12 @@ import { IBiochemicalBloodRequest } from "../models/biochemical_blood_request";
 import { IUserInfoRequest } from "../models/user_info_request";
 import {
   IGeneralBloodRequest,
-  checkAllBloodTestResults,
+  checkAllGeneralBloodTestResults,
 } from "../models/general_blood_request";
-import { IHormonalBloodRequest } from "../models/hormonal_blood_request";
+import {
+  IHormonalBloodRequest,
+  checkAllHormonalTestResults,
+} from "../models/hormonal_blood_request";
 
 export const createBiochemicalBloodExam = async (
   req: Request,
@@ -214,7 +217,7 @@ async function createNewHormonalBloodExam(
 
 export const getHormonalBloodExamById = async (req: Request, res: Response) => {
   try {
-    const { id } = req.params;
+    const { id } = req.body;
     const [row] = await sqlPool.query(
       `select * from hormonal_blood_exam where user_id = ? order by date desc`,
       [id]
@@ -228,7 +231,11 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
           date: new Date(obj.date),
         };
       });
-      res.json(modifiedDataArray).status(200);
+      // @ts-ignore
+      const hormonal_blood_results =
+        checkAllHormonalTestResults(modifiedDataArray);
+
+      res.json([modifiedDataArray, hormonal_blood_results]).status(200);
       return;
     }
     res.json(row).status(200);
@@ -314,8 +321,8 @@ export const getGeneralBloodExamByUserId = async (
       });
 
       // @ts-ignore
-      const allCriticalValues = checkAllBloodTestResults(row);
-
+      const allCriticalValues =
+        checkAllGeneralBloodTestResults(modifiedDataArray);
       res.json([modifiedDataArray, allCriticalValues]).status(200);
       return;
     }

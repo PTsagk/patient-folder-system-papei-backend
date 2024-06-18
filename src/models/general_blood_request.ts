@@ -21,8 +21,9 @@ export interface IGeneralBloodRequest {
 }
 
 // Define the interface for the SubstanceCriticalValue
-export interface SubstanceCriticalValue {
+export interface SubstanceCriticalValueForGeneralBloodExam {
   substance_name: string;
+  date_of_test: Date;
   min: number;
   max: number;
   criticalValue: number;
@@ -32,6 +33,7 @@ export interface SubstanceCriticalValue {
 // Define the object structure with the given interface
 export interface IGeneralBloodTestResults {
   user_age: number;
+  date: Date;
   white_bloodcells: number;
   neutrophils: number;
   lymphocytes: number;
@@ -53,14 +55,12 @@ export interface IGeneralBloodTestResults {
 
 export type GeneralBloodTestKeys = keyof Omit<
   IGeneralBloodTestResults,
-  "user_age"
+  "user_age" | "date"
 >;
 
-// Define the ranges and units for each substance
-
-export function checkCriticalValues(
+export function checkCriticalValuesForGeneralBloodExams(
   testResults: IGeneralBloodTestResults
-): SubstanceCriticalValue[] {
+): SubstanceCriticalValueForGeneralBloodExam[] {
   const general_blood_exam_ranges: Record<
     GeneralBloodTestKeys,
     { min: number; max: number; unit: string }
@@ -83,7 +83,7 @@ export function checkCriticalValues(
     platelets_distribution_range: { min: 9, max: 17, unit: "fl" },
     big_platelets: { min: 13, max: 43, unit: "%" },
   };
-  const criticalValues: SubstanceCriticalValue[] = [];
+  const criticalValues: SubstanceCriticalValueForGeneralBloodExam[] = [];
 
   for (const [key, value] of Object.entries(testResults)) {
     if (key in general_blood_exam_ranges) {
@@ -92,6 +92,7 @@ export function checkCriticalValues(
       if (value < min || value > max) {
         criticalValues.push({
           substance_name: key,
+          date_of_test: testResults.date,
           min,
           max,
           criticalValue: value,
@@ -104,8 +105,8 @@ export function checkCriticalValues(
   return criticalValues;
 }
 
-export function checkAllBloodTestResults(
+export function checkAllGeneralBloodTestResults(
   testResultsArray: IGeneralBloodTestResults[]
-): SubstanceCriticalValue[][] {
-  return testResultsArray.map(checkCriticalValues);
+): SubstanceCriticalValueForGeneralBloodExam[][] {
+  return testResultsArray.map(checkCriticalValuesForGeneralBloodExams);
 }
