@@ -147,6 +147,7 @@ export const userUpdate = async (req: Request, res: Response) => {
 };
 export const partialUserUpdate = async (req: Request, res: Response) => {
   try {
+    req.body.id = res.locals.id;
     await partiaUpdateExistingUser(req.body);
     res.json("OK").status(200);
   } catch (error: any) {
