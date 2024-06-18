@@ -105,6 +105,20 @@ export const userRegister = async (req: Request, res: Response) => {
   }
 };
 
+export const getUserByEmail = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+    let user = await getUserByEmailQuery(email, "user");
+    if (!user) {
+      throw new Error("No user found with this email");
+    }
+    res.json(user).status(200);
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json(error.message);
+  }
+};
+
 export const doctorRegister = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -184,7 +198,7 @@ export async function getUserByIdQuery(id: number, role: userRole) {
   // @ts-ignore
   return rows[0];
 }
-export async function getUserByEmailQuery(email: number, role: userRole) {
+export async function getUserByEmailQuery(email: string, role: userRole) {
   // @ts-ignore
 
   const [rows] = await sqlPool.query(
@@ -220,8 +234,6 @@ export async function createNewUser(user: IUserInfoRequest) {
   // @ts-ignore
 
   // const [row] = await sqlPool.query<IUser>(
-
-  console.log(user);
 
   const [row] = await sqlPool.query<any>(
     `insert into user (name, surname, email, country, city, street,telephone,gender,age,height,weight,amka,region,address_num,doctor_id,password) values (?, ?, ?, ?, ?, ?, ?, ?,?,?,?,?,?,?,?,?)`,

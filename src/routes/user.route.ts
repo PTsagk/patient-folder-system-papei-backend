@@ -3,6 +3,7 @@ import { authenticateAdmin } from "../controllers/authenticate.controller";
 import {
   doctorRegister,
   getAllUsers,
+  getUserByEmail,
   userAuth,
   userDeleteById,
   userLogin,
@@ -16,6 +17,7 @@ router.route("/auth").get(userAuth);
 router.route("/logout").get(userLogout);
 router.route("/register_user").post(userRegister);
 router.route("/register_doctor").post(doctorRegister);
+router.route("/get_user_by_email").post(getUserByEmail);
 //@ts-ignore
 router.route("/update_user").put(authenticateAdmin, userUpdate);
 router.route("/delete/:role").all(authenticateAdmin).delete(userDeleteById);
