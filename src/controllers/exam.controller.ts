@@ -1,13 +1,19 @@
 import { Request, Response } from "express";
-import { IBiochemicalBloodRequest } from "../models/biochemical_blood_request";
-import {
-  IGeneralBloodRequest,
-  checkAllBloodTestResults,
-} from "../models/general_blood_request";
-import { IHormonalBloodRequest } from "../models/hormonal_blood_request";
-import { IUserInfoRequest } from "../models/user_info_request";
 import { sqlPool } from "../mysqlPool";
 import { createNewUser, getUserByEmailQuery } from "./user.controller";
+import {
+  IBiochemicalBloodRequest,
+  checkAllBiochemicalBloodTestResults,
+} from "../models/biochemical_blood_request";
+import { IUserInfoRequest } from "../models/user_info_request";
+import {
+  IGeneralBloodRequest,
+  checkAllGeneralBloodTestResults,
+} from "../models/general_blood_request";
+import {
+  IHormonalBloodRequest,
+  checkAllHormonalBloodTestResults,
+} from "../models/hormonal_blood_request";
 
 export const createBiochemicalBloodExam = async (
   req: Request,
@@ -99,7 +105,9 @@ export const getBiochemicalBloodExamByUserId = async (
           date: new Date(obj.date),
         };
       });
-      res.json(modifiedDataArray).status(200);
+      const biochemical_blood_results =
+        checkAllBiochemicalBloodTestResults(modifiedDataArray);
+      res.json([modifiedDataArray, biochemical_blood_results]).status(200);
       return;
     }
     res.json(row).status(200);
@@ -123,7 +131,7 @@ export const getAllExamsByUserId = async (req: Request, res: Response) => {
     return;
   }
 };
-// hormonal blood exams
+
 export const createHormonalBloodExam = async (req: Request, res: Response) => {
   try {
     const { userInfo, examInfo } = req.body;
@@ -173,25 +181,63 @@ async function getUserExams(userID: number) {
   );
 
   // @ts-ignore
-  if (row.length > 0) {
-    // @ts-ignore
-    const dataArray = [...row, ...row2, ...row3];
-    // @ts-ignore
+  if (row.length > 0 || row2.length > 0 || row3.length > 0) {
+    {
+      // @ts-ignore
+      let modifiedDataArray1 = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+      });
+      const biochemical_blood_results =
+        checkAllBiochemicalBloodTestResults(modifiedDataArray1);
+      // @ts-ignore
+      let modifiedDataArray2 = row2.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+        const hormonal_blood_results =
+          checkAllHormonalBloodTestResults(modifiedDataArray2);
+      });
+      // @ts-ignore
+      let modifiedDataArray3 = row3.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+        const general_blood_results =
+          checkAllGeneralBloodTestResults(modifiedDataArray1);
+      });
+      const data2Array = [
+        ...modifiedDataArray1,
+        ...modifiedDataArray2,
+        ...modifiedDataArray3,
+      ];
+      // @ts-ignore
+      data2Array.sort((a, b) => {
+        b.date - a.date;
+      });
+      // @ts-ignore
+      const dataArray = [...row, ...row2, ...row3];
+      // @ts-ignore
+      dataArray.sort((a, b) => {
+        b.date - a.date;
+      });
 
-    dataArray.sort((a, b) => {
-      b.date - a.date;
-    });
+      let modifiedDataArray = dataArray.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+      });
 
-    let modifiedDataArray = dataArray.map((obj) => {
-      return {
-        ...obj,
-        date: new Date(obj.date),
-      };
-    });
-    return modifiedDataArray;
+      return [modifiedDataArray, data2Array];
+    }
+    // @ts-ignore
+    return row[0];
   }
-  // @ts-ignore
-  return row[0];
 }
 async function createNewHormonalBloodExam(
   userInfo: IUserInfoRequest,
@@ -249,7 +295,11 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
           date: new Date(obj.date),
         };
       });
-      res.json(modifiedDataArray).status(200);
+      // @ts-ignore
+      const hormonal_blood_results =
+        checkAllHormonalBloodTestResults(modifiedDataArray);
+
+      res.json([modifiedDataArray, hormonal_blood_results]).status(200);
       return;
     }
     res.json(row).status(200);
@@ -345,8 +395,8 @@ export const getGeneralBloodExamByUserId = async (
       });
 
       // @ts-ignore
-      const allCriticalValues = checkAllBloodTestResults(row);
-
+      const allCriticalValues =
+        checkAllGeneralBloodTestResults(modifiedDataArray);
       res.json([modifiedDataArray, allCriticalValues]).status(200);
       return;
     }
