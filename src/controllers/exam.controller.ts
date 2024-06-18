@@ -121,7 +121,7 @@ export const getAllExamsByUserId = async (req: Request, res: Response) => {
     return;
   }
 };
-// hormonal blood exams
+
 export const createHormonalBloodExam = async (req: Request, res: Response) => {
   try {
     await createNewHormonalBloodExam(req.body.userInfo, req.body.examInfo);
