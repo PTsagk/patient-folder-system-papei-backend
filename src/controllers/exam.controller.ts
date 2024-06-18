@@ -1,7 +1,10 @@
 import { Request, Response } from "express";
 import { sqlPool } from "../mysqlPool";
 import { createNewUser, getUserByIdQuery } from "./user.controller";
-import { IBiochemicalBloodRequest } from "../models/biochemical_blood_request";
+import {
+  IBiochemicalBloodRequest,
+  checkAllBiochemicalTestResults,
+} from "../models/biochemical_blood_request";
 import { IUserInfoRequest } from "../models/user_info_request";
 import {
   IGeneralBloodRequest,
@@ -92,7 +95,9 @@ export const getBiochemicalBloodExamByUserId = async (
           date: new Date(obj.date),
         };
       });
-      res.json(modifiedDataArray).status(200);
+      const biochemical_blood_results =
+        checkAllBiochemicalTestResults(modifiedDataArray);
+      res.json([modifiedDataArray, biochemical_blood_results]).status(200);
       return;
     }
     res.json(row).status(200);

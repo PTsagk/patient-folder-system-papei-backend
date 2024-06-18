@@ -126,7 +126,7 @@ export function checkCriticalValuesForHormonalBloodExam(
 
   for (const [key, value] of Object.entries(testResult)) {
     //@ts-ignore
-    if (key !== "user_age" && ranges[key]) {
+    if (key !== "user_age" && key !== "date" && ranges[key]) {
       const age = testResult.user_age;
       //@ts-ignore
       const range = getRangeForAge(ranges[key], age);
