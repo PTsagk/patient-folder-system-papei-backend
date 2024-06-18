@@ -24,8 +24,8 @@ export interface IGeneralBloodRequest {
 export interface SubstanceCriticalValueForGeneralBloodExam {
   substance_name: string;
   date_of_test: Date;
-  min: number;
-  max: number;
+  normal_min: number;
+  normal_max: number;
   criticalValue: number;
   unit: string;
 }
@@ -93,8 +93,8 @@ export function checkCriticalValuesForGeneralBloodExams(
         criticalValues.push({
           substance_name: key,
           date_of_test: testResults.date,
-          min,
-          max,
+          normal_min: min,
+          normal_max: max,
           criticalValue: value,
           unit,
         });
