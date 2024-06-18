@@ -107,7 +107,124 @@ export const getBiochemicalBloodExamByUserId = async (
       });
       const biochemical_blood_results =
         checkAllBiochemicalBloodTestResults(modifiedDataArray);
-      res.json([modifiedDataArray, biochemical_blood_results]).status(200);
+      res.json({ modifiedDataArray, biochemical_blood_results }).status(200);
+      return;
+    }
+    res.json(row).status(200);
+    return;
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+    return;
+  }
+};
+export const getBiochemicalBloodByExamId = async (
+  req: Request,
+  res: Response
+) => {
+  try {
+    const { id } = req.query;
+    const [row] = await sqlPool.query(
+      `select * from biochemical_blood_exam where id = ?`,
+      [id]
+    );
+    //@ts-ignore
+    const doctor_id = row[0].doctor_id;
+    const [doctor] = await sqlPool.query(`select * from doctor where id = ?`, [
+      doctor_id,
+    ]);
+    //@ts-ignore
+    if (row.length > 0) {
+      //@ts-ignore
+      let modifiedDataArray = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+        // @ts-ignore
+      });
+
+      const biochemical_blood_results =
+        checkAllBiochemicalBloodTestResults(modifiedDataArray);
+      res
+        .json({ modifiedDataArray, doctor, biochemical_blood_results })
+        .status(200);
+      return;
+    }
+    res.json(row).status(200);
+    return;
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+    return;
+  }
+};
+export const getGeneralBloodByExamId = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.query;
+    const [row] = await sqlPool.query(
+      `select * from general_blood_exam where id = ?`,
+      [id]
+    );
+    //@ts-ignore
+    const doctor_id = row[0].doctor_id;
+    const [doctor] = await sqlPool.query(`select * from doctor where id = ?`, [
+      doctor_id,
+    ]);
+    //@ts-ignore
+    if (row.length > 0) {
+      //@ts-ignore
+      let modifiedDataArray = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+        // @ts-ignore
+      });
+
+      const biochemical_blood_results =
+        checkAllGeneralBloodTestResults(modifiedDataArray);
+      res
+        .json({ modifiedDataArray, doctor, biochemical_blood_results })
+        .status(200);
+      return;
+    }
+    res.json(row).status(200);
+    return;
+  } catch (error) {
+    console.log(error);
+    res.send("Internal Server Error").status(500);
+    return;
+  }
+};
+export const getHormonalBloodByExamId = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.query;
+    const [row] = await sqlPool.query(
+      `select * from hormonal_blood_exam where id = ?`,
+      [id]
+    );
+    //@ts-ignore
+    const doctor_id = row[0].doctor_id;
+    const [doctor] = await sqlPool.query(`select * from doctor where id = ?`, [
+      doctor_id,
+    ]);
+    //@ts-ignore
+    if (row.length > 0) {
+      //@ts-ignore
+      let modifiedDataArray = row.map((obj) => {
+        return {
+          ...obj,
+          date: new Date(obj.date),
+        };
+        // @ts-ignore
+      });
+
+      const biochemical_blood_results =
+        checkAllHormonalBloodTestResults(modifiedDataArray);
+      res
+        .json({ modifiedDataArray, doctor, biochemical_blood_results })
+        .status(200);
       return;
     }
     res.json(row).status(200);
@@ -198,26 +315,27 @@ async function getUserExams(userID: number) {
           ...obj,
           date: new Date(obj.date),
         };
-        const hormonal_blood_results =
-          checkAllHormonalBloodTestResults(modifiedDataArray2);
       });
+      const hormonal_blood_results =
+        checkAllHormonalBloodTestResults(modifiedDataArray2);
       // @ts-ignore
       let modifiedDataArray3 = row3.map((obj) => {
         return {
           ...obj,
           date: new Date(obj.date),
         };
-        const general_blood_results =
-          checkAllGeneralBloodTestResults(modifiedDataArray1);
       });
+      const general_blood_results =
+        checkAllGeneralBloodTestResults(modifiedDataArray3);
       const data2Array = [
-        ...modifiedDataArray1,
-        ...modifiedDataArray2,
-        ...modifiedDataArray3,
+        ...biochemical_blood_results,
+        ...hormonal_blood_results,
+        ...general_blood_results,
       ];
       // @ts-ignore
       data2Array.sort((a, b) => {
-        b.date - a.date;
+        //@ts-ignore
+        b.date_of_test - a.date_of_test;
       });
       // @ts-ignore
       const dataArray = [...row, ...row2, ...row3];

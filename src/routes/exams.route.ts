@@ -1,5 +1,8 @@
 import express from "express";
-import { authenticateDoctor } from "../controllers/authenticate.controller";
+import {
+  authenticateDoctor,
+  authenticateController,
+} from "../controllers/authenticate.controller";
 import {
   createBiochemicalBloodExam,
   createGeneralBloodExam,
@@ -8,6 +11,9 @@ import {
   getBiochemicalBloodExamByUserId,
   getGeneralBloodExamByUserId,
   getHormonalBloodExamById,
+  getBiochemicalBloodByExamId,
+  getGeneralBloodByExamId,
+  getHormonalBloodByExamId,
 } from "../controllers/exam.controller";
 
 const router = express.Router();
@@ -27,5 +33,16 @@ router
   .route("/hormonal_exam")
   .all(authenticateDoctor)
   .post(createHormonalBloodExam);
-
+router
+  .route("/general_exam_by_id")
+  .all(authenticateController)
+  .get(getGeneralBloodByExamId);
+router
+  .route("/biochemical_exam_by_id")
+  .all(authenticateController)
+  .get(getBiochemicalBloodByExamId);
+router
+  .route("/hormonal_exam_by_id")
+  .all(authenticateController)
+  .get(getHormonalBloodByExamId);
 export default router;
