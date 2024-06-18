@@ -155,6 +155,16 @@ export const doctorUpdate = async (req: Request, res: Response) => {
     res.status(500).json(error.message);
   }
 };
+export const partialUserUpdate = async (req: Request, res: Response) => {
+  try {
+    req.body.id = res.locals.id;
+    await partiaUpdateExistingUser(req.body);
+    res.json("OK").status(200);
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json(error.message);
+  }
+};
 
 export const getAllUsers = async (req: Request, res: Response) => {
   try {
@@ -325,6 +335,47 @@ async function updateExistingDoctor(user: any) {
     `update doctor set name=?, surname=?, email=?, telephone=?, amka=? where id=?
      `,
     [user.name, user.surname, user.email, user.telephone, user.amka, user.id]
+  );
+  return row;
+}
+async function partiaUpdateExistingUser(user: any) {
+  // @ts-ignore
+  const [row] = await sqlPool.query(
+    `UPDATE user SET 
+      name = ?, 
+      surname = ?, 
+      email = ?, 
+      country = ?, 
+      city = ?, 
+      street = ?, 
+      telephone = ?, 
+      age = ?, 
+      height = ?, 
+      weight = ?, 
+      amka = ?, 
+      region = ?, 
+      address_num = ?, 
+      doctor_id = ?, 
+      password = ? 
+     WHERE id = ?`,
+    [
+      user.name,
+      user.surname,
+      user.email,
+      user.country,
+      user.city,
+      user.street,
+      user.telephone,
+      user.age,
+      user.height,
+      user.weight,
+      user.amka,
+      user.region,
+      user.address_num,
+      user.doctor_id,
+      user.password,
+      user.id,
+    ]
   );
   return row;
 }
