@@ -296,7 +296,12 @@ async function getUserExams(userID: number) {
       let modifiedDataArray1 = row.map((obj) => {
         return {
           ...obj,
-          date: new Date(obj.date),
+          date:
+            new Date(obj.date).getFullYear() +
+            "-" +
+            (new Date(obj.date).getMonth() + 1) +
+            "-" +
+            new Date(obj.date).getDate(),
         };
       });
       const biochemical_blood_results =
@@ -305,7 +310,11 @@ async function getUserExams(userID: number) {
       let modifiedDataArray2 = row2.map((obj) => {
         return {
           ...obj,
-          date: new Date(obj.date),
+          date: new Date(obj.date).getFullYear() +
+            "-" +
+            (new Date(obj.date).getMonth() + 1) +
+            "-" +
+            new Date(obj.date).getDate(),
         };
       });
       const hormonal_blood_results =
@@ -314,7 +323,11 @@ async function getUserExams(userID: number) {
       let modifiedDataArray3 = row3.map((obj) => {
         return {
           ...obj,
-          date: new Date(obj.date),
+          date: new Date(obj.date).getFullYear() +
+            "-" +
+            (new Date(obj.date).getMonth() + 1) +
+            "-" +
+            new Date(obj.date).getDate(),
         };
       });
       const general_blood_results =
@@ -339,7 +352,11 @@ async function getUserExams(userID: number) {
       let modifiedDataArray = dataArray.map((obj) => {
         return {
           ...obj,
-          date: new Date(obj.date),
+          date: new Date(obj.date).getFullYear() +
+          "-" +
+          (new Date(obj.date).getMonth() + 1) +
+          "-" +
+          new Date(obj.date).getDate(),
         };
       });
 
