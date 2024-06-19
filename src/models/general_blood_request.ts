@@ -27,6 +27,9 @@ export interface SubstanceCriticalValueForGeneralBloodExam {
   normal_min: number;
   normal_max: number;
   criticalValue: number;
+  min_value_for_message?: number;
+  max_value_for_message?: number;
+  message?: string;
   unit: string;
 }
 
@@ -97,6 +100,9 @@ export function checkCriticalValuesForGeneralBloodExams(
           normal_max: max,
           criticalValue: value,
           unit,
+          message: "",
+          min_value_for_message: -1,
+          max_value_for_message: -1,
         });
       }
     }

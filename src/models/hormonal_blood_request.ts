@@ -152,17 +152,17 @@ export function checkCriticalValuesForHormonalBloodExam(
               criticalValue: value,
               unit: unit,
             };
-
-          if (message !== "") {
-            criticalValueEntry.message = message;
-          }
+          criticalValueEntry.message = message;
 
           if (value < actual_max) {
+            criticalValueEntry.min_value_for_message = -1;
             criticalValueEntry.max_value_for_message = actualMax;
-          }
-
-          if (value > actual_min) {
+          } else if (value > actual_min) {
             criticalValueEntry.min_value_for_message = actualMin;
+            criticalValueEntry.max_value_for_message = -1;
+          } else {
+            criticalValueEntry.min_value_for_message = -1;
+            criticalValueEntry.max_value_for_message = -1;
           }
 
           criticalValues.push(criticalValueEntry);
