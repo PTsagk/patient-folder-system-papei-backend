@@ -1,11 +1,8 @@
 import { Request, Response } from "express";
-import { sqlPool } from "../mysqlPool";
-import { createNewUser, getUserByEmailQuery } from "./user.controller";
 import {
   IBiochemicalBloodRequest,
   checkAllBiochemicalBloodTestResults,
 } from "../models/biochemical_blood_request";
-import { IUserInfoRequest } from "../models/user_info_request";
 import {
   IGeneralBloodRequest,
   checkAllGeneralBloodTestResults,
@@ -14,6 +11,9 @@ import {
   IHormonalBloodRequest,
   checkAllHormonalBloodTestResults,
 } from "../models/hormonal_blood_request";
+import { IUserInfoRequest } from "../models/user_info_request";
+import { sqlPool } from "../mysqlPool";
+import { createNewUser, getUserByEmailQuery } from "./user.controller";
 
 export const createBiochemicalBloodExam = async (
   req: Request,
@@ -296,7 +296,12 @@ async function getUserExams(userID: number) {
       let modifiedDataArray1 = row.map((obj) => {
         return {
           ...obj,
-          date: new Date(obj.date),
+          date:
+            new Date(obj.date).getFullYear() +
+            "-" +
+            (new Date(obj.date).getMonth() + 1) +
+            "-" +
+            new Date(obj.date).getDate(),
         };
       });
       const biochemical_blood_results =
@@ -534,28 +539,29 @@ export const createAll3Exams = async (req: Request, res: Response) => {
       });
       user_created = true;
     }
+    const user_id = user.id ?? user.insertId;
     if (!!!!!!!!req.body.hormonal_exam) {
       await createNewHormonalBloodExam(
-        user,
+        { ...req.body.userInfo, id: user_id },
         req.body.hormonal_exam,
         res.locals.id
       );
     }
     if (!!!!!!!!!!req.body.general_exam) {
       await createNewGenerealBloodExam(
-        user,
+        { ...req.body.userInfo, id: user_id },
         req.body.general_exam,
         res.locals.id
       );
     }
     if (!!!!!!!!!!req.body.biochemical_exam) {
       await createNewBiochemicalBloodExam(
-        user,
+        { ...req.body.userInfo, id: user_id },
         req.body.biochemical_exam,
         res.locals.id
       );
     }
-    res.status(200).json({ user_created });
+    res.status(200).json({ user_created, password: user.password });
     return;
   } catch (error) {
     console.log(error);
