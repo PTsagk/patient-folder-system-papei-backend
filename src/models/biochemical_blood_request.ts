@@ -88,7 +88,6 @@ export function checkCriticalValuesForBiochemicalBloodExam(
       },
     ],
     urea: [{ min: 10, max: 50, age_min: 0, age_max: Infinity, unit: "mg/dl" }],
-
     creatinine: [
       { min: 0.24, max: 0.79, age_min: 0, age_max: 13, unit: "mg/dl" },
       { min: 0.7, max: 1.3, age_min: 13, age_max: Infinity, unit: "mg/dl" },
@@ -102,7 +101,6 @@ export function checkCriticalValuesForBiochemicalBloodExam(
       { min: 5, max: 40, age_min: 13, age_max: Infinity, unit: "U/L" },
     ],
     gamma_GT: [{ min: 8, max: 61, age_min: 0, age_max: Infinity, unit: "U/L" }],
-
     cholesterol: [
       { min: 0, max: 170, age_min: 0, age_max: Infinity, unit: "mg/dl" },
     ],
@@ -133,13 +131,11 @@ export function checkCriticalValuesForBiochemicalBloodExam(
     direct_bilirubin: [
       { min: 0.01, max: 0.3, age_min: 0, age_max: Infinity, unit: "mg/dl" },
     ],
-
     LDH: [
       { min: 140, max: 370, age_min: 0, age_max: 2, unit: "U/L" },
       { min: 140, max: 300, age_min: 2, age_max: 15, unit: "U/L" },
       { min: 120, max: 225, age_min: 15, age_max: Infinity, unit: "U/L" },
     ],
-
     alkaline_phosphatase: [
       { min: 39, max: 316, age_min: 0, age_max: 7, unit: "U/L" },
       { min: 39, max: 381, age_min: 7, age_max: 17, unit: "U/L" },
@@ -209,9 +205,9 @@ export function checkCriticalValuesForBiochemicalBloodExam(
         unit: "pmol/l",
         messages: {
           severe: "Severe_insufficiency",
-          low: "insufficiency",
+          moderate: "insufficiency",
           mild: "Mild_insufficiency",
-          high: "Toxicity_Levels",
+          extreme: "Toxicity_Levels",
         },
       },
     ],
@@ -222,16 +218,14 @@ export function checkCriticalValuesForBiochemicalBloodExam(
     if (key !== "user_age" && key !== "date" && ranges[key]) {
       const age = testResult.user_age;
       //@ts-ignore
-      const range = getRangeForAge(ranges[key], age);
+      const range = getRangeForAge(ranges["blood_sugar"], age);
       if (range) {
         const {
           min,
           max,
           unit,
-          actual_min,
           actual_min2,
           actual_min3,
-          actual_max,
           actual_max2,
           actual_max3,
           actual_max4,
@@ -239,8 +233,6 @@ export function checkCriticalValuesForBiochemicalBloodExam(
         } = range;
 
         let message = "";
-        let actualMin = actual_min;
-        let actualMax = actual_max;
         let actualMin2 = actual_min2;
         let actualMax2 = actual_max2;
         let actualMin3 = actual_min3;
@@ -248,29 +240,30 @@ export function checkCriticalValuesForBiochemicalBloodExam(
         let actualMax4 = actual_max4;
 
         if (value < min || value > max) {
-          if (value < min && value < actualMax) {
+          if (
+            actualMin2 !== undefined &&
+            value > actualMin2 &&
+            value <= actualMax2
+          ) {
             message = messages?.low || "";
-          } else if (value > max && value > actualMin) {
-            message = messages?.high || "";
-          }
-          if (value > max && value > actualMin2 && value <= actualMax2) {
-            message = messages?.low || "";
-          } else if (value > max && value > actualMax2) {
+          } else if (actualMax2 !== undefined && value > actualMax2) {
             message = messages?.high || "";
           }
 
-          if (value < min && value >= actualMax3) {
+          if (actualMax3 !== undefined && value < min && value >= actualMax3) {
             message = messages?.mild || "";
-          }
-
-          if (value >= actualMin3 && value < actualMax3) {
-            message = messages?.low || "";
-          }
-
-          if (value > max) {
+          } else if (actualMin3 !== undefined && value < actualMin3) {
             message = messages?.severe || "";
+          } else if (
+            actualMin3 !== undefined &&
+            value >= actualMin3 &&
+            value < actualMax3
+          ) {
+            message = messages?.moderate || "";
+          } else if (actualMax4 !== undefined && value > actualMax4) {
+            message = messages?.extreme || "";
           }
-
+          console.log(message);
           const criticalValueEntry: SubstanceCriticalValueForBiochemicalBloodExam =
             {
               substance_name: key,
@@ -279,42 +272,30 @@ export function checkCriticalValuesForBiochemicalBloodExam(
               normal_max: max,
               criticalValue: value,
               unit: unit,
+              message: message,
             };
-
-          if (message !== "") {
-            criticalValueEntry.message = message;
-          }
-
-          if (value < actual_max) {
-            criticalValueEntry.max_value_for_message = actualMax;
-          }
-
-          if (value > actual_min) {
-            criticalValueEntry.min_value_for_message = actualMin;
-          }
 
           if (value > actualMin2 && value < actualMax2) {
             criticalValueEntry.min_value_for_message = actualMin2;
             criticalValueEntry.max_value_for_message = actualMax2;
-          }
-
-          if (value > actualMax2) {
+          } else if (value > actualMax2) {
             criticalValueEntry.min_value_for_message = actualMax2;
-          }
-
-          if (value > actualMin3 && value < actualMax3) {
+            criticalValueEntry.max_value_for_message = -1;
+          } else if (value > actualMin3 && value < actualMax3) {
             criticalValueEntry.min_value_for_message = actualMin3;
             criticalValueEntry.max_value_for_message = actualMax3;
-          }
-          if (value < actualMin3) {
+          } else if (value < actualMin3) {
+            criticalValueEntry.min_value_for_message = -1;
             criticalValueEntry.max_value_for_message = actualMin3;
-          }
-          if (value > actualMax3 && value < min) {
-            criticalValueEntry.max_value_for_message = min;
+          } else if (value > actualMax3 && value < min) {
             criticalValueEntry.min_value_for_message = actualMax3;
-          }
-          if (value > actualMax4) {
+            criticalValueEntry.max_value_for_message = min;
+          } else if (value > actualMax4) {
             criticalValueEntry.min_value_for_message = actualMax4;
+            criticalValueEntry.max_value_for_message = -1;
+          } else {
+            criticalValueEntry.min_value_for_message = -1;
+            criticalValueEntry.max_value_for_message = -1;
           }
 
           criticalValues.push(criticalValueEntry);
@@ -325,7 +306,6 @@ export function checkCriticalValuesForBiochemicalBloodExam(
 
   return criticalValues;
 }
-
 export function checkAllBiochemicalBloodTestResults(
   testResultsArray: BiochemicalBloodExamResults[]
 ): SubstanceCriticalValueForBiochemicalBloodExam[][] {
