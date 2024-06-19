@@ -28,10 +28,10 @@ export const createBiochemicalBloodExam = async (
       req.body.examInfo,
       res.locals.id
     );
-    res.json("OK").status(200);
+    res.status(200).json("OK");
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
   }
 };
 
@@ -99,14 +99,14 @@ export const getBiochemicalBloodExamByUserId = async (
       });
       const biochemical_blood_results =
         checkAllBiochemicalBloodTestResults(modifiedDataArray);
-      res.json({ modifiedDataArray, biochemical_blood_results }).status(200);
+      res.status(200).json({ modifiedDataArray, biochemical_blood_results });
       return;
     }
-    res.json(row).status(200);
+    res.status(200).json(row);
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -143,11 +143,11 @@ export const getBiochemicalBloodByExamId = async (
         .status(200);
       return;
     }
-    res.json(row).status(200);
+    res.status(200).json(row);
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -181,11 +181,11 @@ export const getGeneralBloodByExamId = async (req: Request, res: Response) => {
         .status(200);
       return;
     }
-    res.json(row).status(200);
+    res.status(200).json(row);
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -219,11 +219,11 @@ export const getHormonalBloodByExamId = async (req: Request, res: Response) => {
         .status(200);
       return;
     }
-    res.json(row).status(200);
+    res.status(200).json(row);
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -236,7 +236,7 @@ export const getAllExamsByUserId = async (req: Request, res: Response) => {
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -248,11 +248,11 @@ export const createHormonalBloodExam = async (req: Request, res: Response) => {
       throw new Error("Missing hormonal exam info");
     }
     await createNewHormonalBloodExam(userInfo, examInfo, res.locals.id);
-    res.json("OK").status(200);
+    res.status(200).json("OK");
     return;
   } catch (error) {
     // console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -415,14 +415,14 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
       const hormonal_blood_results =
         checkAllHormonalBloodTestResults(modifiedDataArray);
 
-      res.json([modifiedDataArray, hormonal_blood_results]).status(200);
+      res.status(200).json([modifiedDataArray, hormonal_blood_results]);
       return;
     }
-    res.json(row).status(200);
+    res.status(200).json(row);
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -437,11 +437,11 @@ export const createGeneralBloodExam = async (req: Request, res: Response) => {
       req.body.examInfo,
       res.locals.id
     );
-    res.json("OK").status(200);
+    res.status(200).json("OK");
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -504,14 +504,14 @@ export const getGeneralBloodExamByUserId = async (
       // @ts-ignore
       const allCriticalValues =
         checkAllGeneralBloodTestResults(modifiedDataArray);
-      res.json([modifiedDataArray, allCriticalValues]).status(200);
+      res.status(200).json([modifiedDataArray, allCriticalValues]);
       return;
     }
-    res.json(row).status(200);
+    res.status(200).json(row);
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
@@ -555,11 +555,11 @@ export const createAll3Exams = async (req: Request, res: Response) => {
         res.locals.id
       );
     }
-    res.json({ user_created }).status(200);
+    res.status(200).json({ user_created });
     return;
   } catch (error) {
     console.log(error);
-    res.send("Internal Server Error").status(500);
+    res.status(500).send("Internal Server Error");
     return;
   }
 };
