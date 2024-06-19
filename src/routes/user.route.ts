@@ -9,6 +9,7 @@ import {
   doctorUpdate,
   getAllUsers,
   getUserByEmail,
+  getUsersByDoctorId,
   partialUserUpdate,
   userAuth,
   userDeleteById,
@@ -25,6 +26,7 @@ router
   .put(partialUserUpdate);
 router.route("/auth").get(userAuth);
 router.route("/logout").get(userLogout);
+router.route("/users_by_doctor").get(getUsersByDoctorId);
 router.route("/register_user").post(userRegister);
 router.route("/register_doctor").post(doctorRegister);
 router.route("/get_user_by_email").post(getUserByEmail);

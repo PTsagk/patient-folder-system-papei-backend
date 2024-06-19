@@ -119,6 +119,17 @@ export const getUserByEmail = async (req: Request, res: Response) => {
   }
 };
 
+export const getUsersByDoctorId = async (req: Request, res: Response) => {
+  try {
+    const doctorID = req.query.id;
+    const usersList = await getUsersByDoctorIdQuery(doctorID);
+    res.json(usersList).status(200);
+  } catch (error: any) {
+    console.log(error);
+    res.status(500).json(error.message);
+  }
+};
+
 export const doctorRegister = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
@@ -384,6 +395,16 @@ async function deleteUserById(id: any, role: string) {
     `delete from ${role} where id=?
      `,
     [id]
+  );
+  return row;
+}
+async function getUsersByDoctorIdQuery(doctorID: any) {
+  // @ts-ignore
+
+  const [row] = await sqlPool.query(
+    `select * from user where doctor_id=?
+     `,
+    [doctorID]
   );
   return row;
 }
