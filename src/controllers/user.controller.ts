@@ -277,7 +277,7 @@ export async function createNewUser(user: IUserInfoRequest) {
     ]
   );
   console.log(row, "row");
-  return row;
+  return { ...row, password };
 }
 
 async function createNewDoctor(doctor: any) {
