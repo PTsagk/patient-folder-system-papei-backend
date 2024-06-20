@@ -59,6 +59,7 @@ export const userAuth = async (req: Request, res: Response) => {
         const user = await getUserByIdQuery(id, role);
         if (user) {
           res.json(user).status(200);
+          return;
         } else {
           throw new Error("User not found");
         }

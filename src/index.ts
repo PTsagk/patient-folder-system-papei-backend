@@ -34,7 +34,7 @@ app.use(
 const port = process.env.PORT || 8000;
 
 app.use("/user", userRoute);
-app.use("/exam", authenticateDoctor, examRoute);
+app.use("/exam", examRoute);
 // app.use("/program", programRoute);
 
 app.get("*", (req: Request, res: Response) => {

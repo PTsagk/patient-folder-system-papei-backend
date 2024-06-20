@@ -365,9 +365,9 @@ async function getUserExams(userID: number) {
 
       return [modifiedDataArray, data2Array];
     }
-    // @ts-ignore
-    return row[0];
   }
+  // @ts-ignore
+  return row[0];
 }
 async function createNewHormonalBloodExam(
   userInfo: IUserInfoRequest,
