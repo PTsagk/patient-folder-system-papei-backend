@@ -218,7 +218,7 @@ export function checkCriticalValuesForBiochemicalBloodExam(
     if (key !== "user_age" && key !== "date" && ranges[key]) {
       const age = testResult.user_age;
       //@ts-ignore
-      const range = getRangeForAge(ranges["blood_sugar"], age);
+      const range = getRangeForAge(ranges[key], age);
       if (range) {
         const {
           min,

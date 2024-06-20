@@ -259,7 +259,7 @@ export const createHormonalBloodExam = async (req: Request, res: Response) => {
 
 async function getUserExams(userID: number) {
   const [row] = await sqlPool.query(
-    `SELECT date,blood_sugar,urea,creatinine,
+    `SELECT user_age,date,blood_sugar,urea,creatinine,
     SGOT,SGPT,gamma_GT,cholesterol,triglycerides,cholesterol_HDL,
     cholesterol_LDL,albumin,total_bilirubin,direct_bilirubin,LDH,
     alkaline_phosphatase,potassium,sodium,total_calcium,iron,vitamin_B12,
@@ -271,7 +271,7 @@ async function getUserExams(userID: number) {
   );
   const [row2] = await sqlPool.query(
     `
-    select date,thyroid_stimulating_hormone,triiodothyronine,
+    select user_age,date,thyroid_stimulating_hormone,triiodothyronine,
     free_thyroxine,anti_TPO,anti_TG,parathormone,calcitonin
     from hormonal_blood_exam
     where user_id = ?`,
@@ -280,7 +280,7 @@ async function getUserExams(userID: number) {
 
   const [row3] = await sqlPool.query(
     `
-    select date,white_bloodcells,neutrophils,lymphocytes,single_cells,eosinophils,basophils,
+    select user_age,date,white_bloodcells,neutrophils,lymphocytes,single_cells,eosinophils,basophils,
     red_blood_cells,hemoglobin,hematocrit,avg_red_cells_volume,avg_hemoglobin_content,
     avg_hemoglobin_density,red_cell_distribution_range,platelets,avg_platelets_volume,
     platelets_distribution_range,big_platelets
@@ -301,7 +301,13 @@ async function getUserExams(userID: number) {
             "-" +
             (new Date(obj.date).getMonth() + 1) +
             "-" +
-            new Date(obj.date).getDate(),
+            new Date(obj.date).getDate() +
+            "-" +
+            new Date(obj.date).getHours() +
+            ":" +
+            new Date(obj.date).getMinutes() +
+            ":" +
+            new Date(obj.date).getSeconds(),
         };
       });
       const biochemical_blood_results =
@@ -315,7 +321,13 @@ async function getUserExams(userID: number) {
             "-" +
             (new Date(obj.date).getMonth() + 1) +
             "-" +
-            new Date(obj.date).getDate(),
+            new Date(obj.date).getDate() +
+            "-" +
+            new Date(obj.date).getHours() +
+            ":" +
+            new Date(obj.date).getMinutes() +
+            ":" +
+            new Date(obj.date).getSeconds(),
         };
       });
       const hormonal_blood_results =
@@ -329,7 +341,13 @@ async function getUserExams(userID: number) {
             "-" +
             (new Date(obj.date).getMonth() + 1) +
             "-" +
-            new Date(obj.date).getDate(),
+            new Date(obj.date).getDate() +
+            "-" +
+            new Date(obj.date).getHours() +
+            ":" +
+            new Date(obj.date).getMinutes() +
+            ":" +
+            new Date(obj.date).getSeconds(),
         };
       });
       const general_blood_results =
@@ -339,17 +357,9 @@ async function getUserExams(userID: number) {
         ...hormonal_blood_results,
         ...general_blood_results,
       ];
-      // @ts-ignore
-      data2Array.sort((a, b) => {
-        //@ts-ignore
-        b.date_of_test - a.date_of_test;
-      });
+
       // @ts-ignore
       const dataArray = [...row, ...row2, ...row3];
-      // @ts-ignore
-      dataArray.sort((a, b) => {
-        b.date - a.date;
-      });
 
       let modifiedDataArray = dataArray.map((obj) => {
         return {
@@ -359,7 +369,13 @@ async function getUserExams(userID: number) {
             "-" +
             (new Date(obj.date).getMonth() + 1) +
             "-" +
-            new Date(obj.date).getDate(),
+            new Date(obj.date).getDate() +
+            "-" +
+            new Date(obj.date).getHours() +
+            ":" +
+            new Date(obj.date).getMinutes() +
+            ":" +
+            new Date(obj.date).getSeconds(),
         };
       });
 
@@ -413,7 +429,18 @@ export const getHormonalBloodExamById = async (req: Request, res: Response) => {
       let modifiedDataArray = row.map((obj) => {
         return {
           ...obj,
-          date: new Date(obj.date),
+          date:
+            new Date(obj.date).getFullYear() +
+            "-" +
+            (new Date(obj.date).getMonth() + 1) +
+            "-" +
+            new Date(obj.date).getDate() +
+            "-" +
+            new Date(obj.date).getHours() +
+            ":" +
+            new Date(obj.date).getMinutes() +
+            ":" +
+            new Date(obj.date).getSeconds(),
         };
       });
       // @ts-ignore
@@ -502,7 +529,18 @@ export const getGeneralBloodExamByUserId = async (
       let modifiedDataArray = row.map((obj) => {
         return {
           ...obj,
-          date: new Date(obj.date),
+          date:
+            new Date(obj.date).getFullYear() +
+            "-" +
+            (new Date(obj.date).getMonth() + 1) +
+            "-" +
+            new Date(obj.date).getDate() +
+            "-" +
+            new Date(obj.date).getHours() +
+            ":" +
+            new Date(obj.date).getMinutes() +
+            ":" +
+            new Date(obj.date).getSeconds(),
         };
       });
 
@@ -540,21 +578,21 @@ export const createAll3Exams = async (req: Request, res: Response) => {
       user_created = true;
     }
     const user_id = user.id ?? user.insertId;
-    if (!!!!!!!!req.body.hormonal_exam) {
+    if (!!req.body.hormonal_exam) {
       await createNewHormonalBloodExam(
         { ...req.body.userInfo, id: user_id },
         req.body.hormonal_exam,
         res.locals.id
       );
     }
-    if (!!!!!!!!!!req.body.general_exam) {
+    if (!!req.body.general_exam) {
       await createNewGenerealBloodExam(
         { ...req.body.userInfo, id: user_id },
         req.body.general_exam,
         res.locals.id
       );
     }
-    if (!!!!!!!!!!req.body.biochemical_exam) {
+    if (!!req.body.biochemical_exam) {
       await createNewBiochemicalBloodExam(
         { ...req.body.userInfo, id: user_id },
         req.body.biochemical_exam,
